@@ -1,4 +1,4 @@
-,Title,Year,Publisher,Genre,Platform,Metascore,Avg_Userscore,No_Players
+id,title,year,publisher,genres,platform,metascore,avg_userscore,no_players
 0,The Legend of Zelda: Ocarina of Time,1998,Nintendo,Action Adventure;Fantasy,Nintendo64,99,9.1,1 Player
 1,Tony Hawk's Pro Skater 2,2000,NeversoftEntertainment,Sports;Alternative;Skateboarding,PlayStation,98,7.4,1-2 
 2,Grand Theft Auto IV,2008,RockstarNorth,Action Adventure;Modern;Modern;Open-World,PlayStation3,98,7.5,1 Player
