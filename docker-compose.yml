@@ -1,16 +1,14 @@
 version: "3"
 services:
   db:
-    image: "postgres"
-    container_name: "postgresdb"
+    image: postgres
+    container_name: postgresdb
     environment:
       - POSTGRES_USER=videogamer
       - POSTGRES_PASSWORD=pwned-by-headshot-1337
       - POSTGRES_DB=videogames
     ports:
-      - "5432:5432"
+      - 5432:5432
     volumes:
-      - ./pgdatabase:/var/lib/postgresql/data
-      - ./schemas/giantbomb.sql:/docker-entrypoint-initdb.d/giantbomb.sql
-      - ./schemas/igdb.sql:/docker-entrypoint-initdb.d/igdb.sql
-      - ./schemas/metacritic.sql:/docker-entrypoint-initdb.d/metacritic.sql
+      - ./.pgdatabase:/var/lib/postgresql/data
+      - ./createdb.sql:/docker-entrypoint-initdb.d/createdb.sql
