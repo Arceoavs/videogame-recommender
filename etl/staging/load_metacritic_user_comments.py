@@ -10,7 +10,7 @@ file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../datas
 df = pd.read_csv(file_path, sep=',', quotechar='"')
 
 # Remove all records with no username or seemingly deleted accounts
-df = df[(df.username is not None) & (df.username != 'AnonymousMC') & (df.username != '[Anonymous]')]
+df = df[df.username.notnull() & (df.username != 'AnonymousMC') & (df.username != '[Anonymous]')]
 
 print(df.dtypes)
 
