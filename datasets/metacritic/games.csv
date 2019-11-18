@@ -1358,7 +1358,6 @@ id,title,year,publisher,genres,platform,metascore,avg_userscore,no_players
 1357,Ni no Kuni: Wrath of the White Witch,2013,Level5,General;Role-Playing;Console-style RPG;Console-style RPG;Japanese-Style,PlayStation3,85,8.7,No Online Multiplayer
 1358,The Wolf Among Us: Episode 1 - Faith,2013,TelltaleGames,Action Adventure;Adventure;Fantasy;General;Fantasy;Point-and-Click,PlayStation3,85,8.8,not specified
 1359,UFC Undisputed 2010,2010,Yuke's,Action;Sports;Fighting;Fighting;Individual;Wrestling;Combat;Wrestling,PlayStation3,85,7.2,not specified
-1360,Bad Request,not specified,not specified,no genre,not specified,not specified,not specified,not specified
 1361,Plants vs. Zombies,2011,PopCap,Strategy;Real-Time;General;General;Fantasy;Defense,PlayStation3,85,7.9,not specified
 1362,NBA Live 2004,2003,EASports,Sports;Traditional;Basketball;Sim,Xbox,85,8.2,1-4 
 1363,NHL 2004,2003,EABlackBox,Sports;Traditional;Ice Hockey;Sim,Xbox,85,6.5,1-4 
@@ -2120,12 +2119,6 @@ id,title,year,publisher,genres,platform,metascore,avg_userscore,no_players
 2119,Persona 4 Arena,2012,ArcSystemWorks,Action;Fighting;Fighting;2D;2D,Xbox360,83,7.6,1-2 
 2120,The Elder Scrolls Online: Summerset,2018,ZeniMaxMedia,Role-Playing;Massively Multiplayer,PC,83,5.1,not specified
 2121,The Blackwell Epiphany,2014,WadjetEyeGames,General;General;Adventure;Point-and-Click,PC,83,7.7,not specified
-2122,This page isn’t working,not specified,not specified,no genre,not specified,not specified,not specified,not specified
-2123,This page isn’t working,not specified,not specified,no genre,not specified,not specified,not specified,not specified
-2124,This page isn’t working,not specified,not specified,no genre,not specified,not specified,not specified,not specified
-2125,This page isn’t working,not specified,not specified,no genre,not specified,not specified,not specified,not specified
-2126,This page isn’t working,not specified,not specified,no genre,not specified,not specified,not specified,not specified
-2127,This page isn’t working,not specified,not specified,no genre,not specified,not specified,not specified,not specified
 2128,Tomb Raider: Anniversary,2007,NixxesSoftware,Action Adventure;Modern;Modern;Linear,PC,83,8.1,No Online Multiplayer
 2129,Need for Speed: Most Wanted,2005,EACanada,Driving;Racing;Simulation;GT / Street;GT / Street;Automobile,Xbox360,83,8.5,Up to 4 
 2130,Bangai-O Spirits,2008,Treasure,Action;Shooter;Shooter;Scrolling;Scrolling;Shoot-'Em-Up;Vertical,DS,83,8.1,4  Online
@@ -2975,7 +2968,6 @@ id,title,year,publisher,genres,platform,metascore,avg_userscore,no_players
 2974,Mario Golf: Toadstool Tour,2003,CamelotSoftwarePlanning,Sports;Traditional;Golf;Arcade,GameCube,81,8.1,1-4 
 2975,Cities: Skylines - PlayStation 4 Edition,2017,Tantalus,Strategy;Management;Government,PlayStation4,81,7.7,No Online Multiplayer
 2976,Unravel,2016,ColdwoodInteractive,Action;Platformer;2D,PC,81,7.8,not specified
-2977,page not found,not specified,not specified,no genre,not specified,not specified,not specified,not specified
 2978,Midnight Club II,2003,RockstarSanDiego,Driving;Racing;Simulation;GT / Street;GT / Street;Automobile,PC,81,8.2,1-8 
 2979,Chessmaster 10th Edition,2004,Ubisoft,Miscellaneous;Board Games;Board Games,PC,81,7.5,1-2 
 2980,Hitman: Blood Money,2006,IoInteractive,Action Adventure;Modern,Xbox,81,8.9,1 Player
@@ -4406,7 +4398,6 @@ id,title,year,publisher,genres,platform,metascore,avg_userscore,no_players
 4405,The Thing,2002,ComputerArtworks,Action Adventure;Horror,PlayStation2,78,7.3,1 Player
 4406,DeathSpank: Thongs of Virtue,2011,HotheadGames,Role-Playing;Action RPG;Action RPG,Xbox360,78,8.1,1 Player
 4407,Hatsune Miku: Project Diva X,2016,Sega,Action;Rhythm;Music,PlayStation4,78,7.3,No Online Multiplayer
-4408,Bad Request,not specified,not specified,no genre,not specified,not specified,not specified,not specified
 4409,DeadCore,2013,5-BitsGames,Action;Shooter;First-Person;Sci-Fi;Arcade,PC,78,6.8,No Online Multiplayer
 4410,Conker: Live & Reloaded,2005,RareLtd.,Action;Shooter;Third-Person;Fantasy,Xbox,78,8.2,1-2 
 4411,Castlevania: The Adventure ReBirth,2009,M2,Action;Platformer;Platformer;2D;2D,Wii,78,8.8,No Online Multiplayer
@@ -4432,7 +4423,6 @@ id,title,year,publisher,genres,platform,metascore,avg_userscore,no_players
 4431,Dead Rising 2,2010,BlueCastleGames,Action Adventure;Horror;Horror;Open-World,PC,78,6.5,not specified
 4432,TumbleSeed,2017,"BenedictFritz,aeiowu",Action;General,Switch,78,7.1,No Online Multiplayer
 4433,ONRUSH,2018,Codemasters,Racing;Arcade;Automobile,XboxOne,78,6.6,
-4434,Bad Request,not specified,not specified,no genre,not specified,not specified,not specified,not specified
 4435,MotorStorm RC,2012,EvolutionStudios,Driving;Racing;Simulation;Arcade;Rally / Offroad;Rally / Offroad;Automobile,PlayStationVita,78,6.8,not specified
 4436,AstroPop,2006,PopCap,Miscellaneous;Puzzle;Puzzle;General;General,Xbox360,78,5.4,1 Player
 4437,Dragon Quest VI: Realms of Revelation,2011,ArtePiazza,Role-Playing;Console-style RPG;Console-style RPG;Japanese-Style,DS,78,8.2,2 
