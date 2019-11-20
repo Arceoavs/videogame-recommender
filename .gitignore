@@ -1,9 +1,21 @@
+# Editor specific
+.vscode
+
 # macOS specific
 .DS_Store
 
-# Python chache if you execute python command line
+# Python specific and python chache if you execute python command line
+venv/
 __pycache__
 *.pyc
+
+# Flask specific
+migrations/
+.mypy_cache
+.pytest_cache
+api.log
+test.db
+creds.ini
 
 # outdated database mounts
 .pgdatabase
