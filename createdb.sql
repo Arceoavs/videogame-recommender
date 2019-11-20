@@ -1,3 +1,0 @@
-CREATE SCHEMA giantbomb;
-CREATE SCHEMA igdb;
-CREATE SCHEMA metacritic;
