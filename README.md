@@ -18,13 +18,19 @@ To access the database, use the following credentials:
 
 **ETL**
 
-The ETL service runs all the python scripts. You can access it simply with `docker exec etl <your command>`, for example `docker exec etl bash` to open the bash of the container or `docker exec etl python path/to/file.py` to execute a python script in the container. The working directory is the etl directory.
+The ETL service runs all the python scripts. You can use the python installation with `docker exec etl <your command>`, for example `docker exec etl bash` to open the bash of the container or `docker exec etl python path/to/file.py` to execute a python script in the container. The working directory is the etl directory. Additional .sh files bundle multiple python commands for easier use.
 
 In order to prepare the database (e.g. create schemas), run:
-`$ docker-compose exec etl sh scripts/setup.sh`
+
+```
+$ docker-compose exec etl sh scripts/setup.sh
+```
 
 To load all CSV files into the database, run:
-`$ docker-compose exec etl sh scripts/load_csv_files.sh`
+
+```
+$ docker-compose exec etl sh scripts/load_csv_files.sh
+```
 
 **Flask**
 
