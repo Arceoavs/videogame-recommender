@@ -2,6 +2,31 @@
 
 University project for a video game recommender system
 
+## Project Setup
+
+This project uses Docker. If you run the project for the first time, run `docker-compose build`. This will take some time. For the next time, just enter `docker-compose up` to start all services and `docker-compose down` to stop them. You need to run `docker-compose build` only again if you add changes for the container, e.g. install a new python library via pip in the container. The following services are started:
+
+**Postgres Database**
+To access the database, use the following credentials:
+
+- Host: localhost
+- Port: 5432
+- Username: videogamer
+- Password: pwned-by-headshot-1337
+- Database: videogames
+
+**ETL**
+The ETL service runs all the python scripts. You can access it simply with `docker exec etl <your command>`, for example `docker exec etl bash` to open the bash of the container or `docker exec etl python path/to/file.py` to execute a python script in the container. The working directory is the etl directory.
+
+In order to prepare the database (e.g. create schemas), run:
+`docker-compose exec etl sh scripts/setup.sh`
+
+To load all CSV files into the database, run:
+`docker-compose exec etl sh scripts/load_csv_files.sh`
+
+**Flask**
+Flask listens on port 5000. You can access the web application on [localhost:5000](http://localhost:5000) by default.
+
 ## Datasets
 
 ### Metacritic
