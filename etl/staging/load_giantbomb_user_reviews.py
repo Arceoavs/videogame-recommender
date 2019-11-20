@@ -3,7 +3,9 @@ import pandas as pd
 import psycopg2
 from engine import engine
 
-file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../datasets/giantbomb/user_reviews.csv'))
+file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../datasets/giantbomb/user_reviews.csv'))
+
+print(f'Loading file {file_path} into database...')
 
 df = pd.read_csv(file_path, sep=';', quotechar='|')
 

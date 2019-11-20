@@ -3,7 +3,9 @@ import pandas as pd
 import psycopg2
 from engine import engine
 
-file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../datasets/giantbomb/games.csv'))
+file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../datasets/giantbomb/games.csv'))
+
+print(f'Loading file {file_path} into database...')
 
 missing_values = [',', '.', '..', '...', '....', '-', '--', '---']
 df = pd.read_csv(file_path, sep=';', quotechar='|', na_values=missing_values)
