@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 import psycopg2
-from engine import engine
+from utilities import engine
 
 file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../datasets/giantbomb/user_reviews.csv'))
 

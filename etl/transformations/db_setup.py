@@ -1,4 +1,4 @@
-from engine import engine
+from utilities import engine
 
 with engine.connect() as connection:
   connection.execute("""CREATE SCHEMA IF NOT EXISTS igdb""")
