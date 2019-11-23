@@ -4,7 +4,19 @@ University project for a video game recommender system
 
 ## Project Setup
 
-This project uses Docker. If you run the project for the first time, run `docker-compose build`. This will take some time. For the next time, just enter `docker-compose up` to start all services and `docker-compose down` to stop them. You need to run `docker-compose build` only again if you add changes for the container, e.g. install a new python library via pip in the container. The following services are started:
+This project uses Docker. If you run the project for the first time, run :
+
+```
+$ docker-compose build`
+```
+
+This will take some time. For the next time, just enter
+
+```
+$ docker-compose up
+```
+
+to start all services and `docker-compose down` to stop them. You need to run `docker-compose build` only again if you add changes for the container, e.g. install a new python library via pip in the container. The following services are started.
 
 **Postgres Database**
 
@@ -38,7 +50,7 @@ If you want to run only a python script, just use:
 $ docker-compose exec etl python transformations/load_metacritic_games.py
 ```
 
-**Flask**
+**Flask Web API**
 
 Flask listens on port 5000. You can access the web application on [localhost:5000](http://localhost:5000) by default.
 
