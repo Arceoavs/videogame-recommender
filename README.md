@@ -7,7 +7,7 @@ University project for a video game recommender system
 This project uses Docker. If you run the project for the first time, run :
 
 ```
-$ docker-compose build`
+$ docker-compose build
 ```
 
 This will take some time. For the next time, just enter
