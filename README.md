@@ -23,13 +23,19 @@ The ETL service runs all the python scripts. You can use the python installation
 In order to prepare the database (e.g. create schemas), run:
 
 ```
-$ docker-compose exec etl sh scripts/setup.sh
+$ docker-compose exec etl sh jobs/setup.sh
 ```
 
 To load all CSV files into the database, run:
 
 ```
-$ docker-compose exec etl sh scripts/load_csv_files.sh
+$ docker-compose exec etl sh jobs/load_csv_files.sh
+```
+
+If you want to run only a python script, just use:
+
+```
+$ docker-compose exec etl python transformations/load_metacritic_games.py
 ```
 
 **Flask**
