@@ -1,6 +1,5 @@
 import os
 import pandas as pd
-import psycopg2
 from utilities import engine
 
 file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../datasets/metacritic/user_comments.csv"))

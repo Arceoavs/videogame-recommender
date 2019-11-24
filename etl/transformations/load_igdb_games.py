@@ -1,6 +1,5 @@
 import os
 import pandas as pd
-import psycopg2
 import sqlalchemy
 from sqlalchemy.dialects import postgresql
 from utilities import engine, liststringToList
