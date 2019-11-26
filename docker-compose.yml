@@ -26,21 +26,21 @@ services:
     volumes:
       - ./etl:/etl
     restart: always
-#  web:
- #   build:
-  #    context: ./web
-   #   dockerfile: Dockerfile-dev
-    #depends_on:
-     # - postgres
-   # entrypoint:
-   #   - /web/scripts/docker_script.sh
-   # environment:
-   #   - FLASK_ENV=docker
-   # ports:
-   #   - 5000:5000
-   # volumes:
-   #   - ./web:/web
-   # restart: always
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile-dev
+    depends_on:
+      - postgres
+    entrypoint:
+      - /web/scripts/docker_script.sh
+    environment:
+      - FLASK_ENV=docker
+    ports:
+      - 5000:5000
+    volumes:
+      - ./web:/web
+    restart: always
 
 volumes:
   postgresdb:
