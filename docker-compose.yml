@@ -1,0 +1,47 @@
+version: "3.7"
+services:
+  postgres:
+    image: postgres:12
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    ports:
+      - 5432:5432
+    volumes:
+      - postgresdb:/var/lib/postgresql/data
+    restart: always
+  etl:
+    build:
+      context: ./etl
+    depends_on:
+      - postgres
+    environment:
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - PYTHONDONTWRITEBYTECODE=1
+    volumes:
+      - ./etl:/etl
+    restart: always
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile-dev
+    depends_on:
+      - postgres
+    entrypoint:
+      - /web/scripts/docker_script.sh
+    environment:
+      - FLASK_ENV=docker
+    ports:
+      - 5000:5000
+    volumes:
+      - ./web:/web
+    restart: always
+
+volumes:
+  postgresdb:
+    name: "postgresdb"
