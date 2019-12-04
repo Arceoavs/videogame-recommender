@@ -9,7 +9,7 @@ services:
     ports:
       - 5432:5432
     volumes:
-      - postgresdb:/var/lib/postgresql/data
+      - postgresdb:/var/lib/postgresql/data:z
     restart: always
   etl:
     build:
@@ -24,7 +24,7 @@ services:
       - POSTGRES_DB=${POSTGRES_DB}
       - PYTHONDONTWRITEBYTECODE=1
     volumes:
-      - ./etl:/etl
+      - ./etl:/etl:z
     restart: always
   web:
     build:
@@ -39,7 +39,7 @@ services:
     ports:
       - 5000:5000
     volumes:
-      - ./web:/web
+      - ./web:/web:z
     restart: always
 
 volumes:
