@@ -38,7 +38,7 @@ with engine.connect() as connection:
 
   matching_pairs = ssj.edit_distance_join(
     metacritic_genres, igdb_genres, 
-    'name', 'id', 
+    'id', 'id', 
     'stem', 'stem', 
     0, 
     l_out_attrs=['stem', 'name'], r_out_attrs=['stem', 'name'],
