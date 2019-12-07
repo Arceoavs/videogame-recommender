@@ -1,3 +1,4 @@
+"""This module initializes the whole application for use as an API server"""
 import os
 import logging
 
@@ -10,26 +11,13 @@ from sqlalchemy_utils import create_database, database_exists
 
 from api.config import config
 from api.core import all_exception_handler
-
-
-class RequestFormatter(logging.Formatter):
-    def format(self, record):
-        record.url = request.url
-        record.remote_addr = request.remote_addr
-        return super().format(record)
+from api.resources import resources
+from api.models import db
 
 
 # why we use application factories http://flask.pocoo.org/docs/1.0/patterns/appfactories/#app-factories
 def create_app(test_config=None):
-    """
-    The flask application factory. To run the app somewhere else you can:
-    ```
-    from api import create_app
-    app = create_app()
-
-    if __main__ == "__name__":
-        app.run()
-    """
+    """The flask application factory."""
     app = Flask(__name__)
     api = Api(app)
     app.config['JWT_SECRET_KEY'] = 'jwt-secret-string'
@@ -40,9 +28,19 @@ def create_app(test_config=None):
     @jwt.token_in_blacklist_loader
     def check_if_token_in_blacklist(decrypted_token):
         jti = decrypted_token['jti']
-        return models.RevokedTokenModel.is_jti_blacklisted(jti)
+        return models.RevokedToken.is_jti_blacklisted(jti)
 
     CORS(app)  # add CORS
+
+    # register RESTful resources
+    api.add_resource(resources.UserRegistration, '/registration')
+    api.add_resource(resources.UserLogin, '/login')
+    api.add_resource(resources.UserLogoutAccess, '/logout/access')
+    api.add_resource(resources.UserLogoutRefresh, '/logout/refresh')
+    api.add_resource(resources.TokenRefresh, '/token/refresh')
+    api.add_resource(resources.AllUsers, '/users')
+    api.add_resource(resources.SecretResource, '/secret')
+    api.add_resource(resources.Index, '/')
 
     # check environment variables to see which config to load
     env = os.environ.get("FLASK_ENV", "dev")
@@ -65,18 +63,6 @@ def create_app(test_config=None):
             create_database(db_url)
 
     # register sqlalchemy to this app
-    from api.models import db
-
-    # register RESTful resources
-    from api.resources import resources
-    api.add_resource(resources.UserRegistration, '/registration')
-    api.add_resource(resources.UserLogin, '/login')
-    api.add_resource(resources.UserLogoutAccess, '/logout/access')
-    api.add_resource(resources.UserLogoutRefresh, '/logout/refresh')
-    api.add_resource(resources.TokenRefresh, '/token/refresh')
-    api.add_resource(resources.AllUsers, '/users')
-    api.add_resource(resources.SecretResource, '/secret')
-
     db.init_app(app)  # initialize Flask SQLALchemy with this flask app
     Migrate(app, db)
 

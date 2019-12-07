@@ -14,6 +14,13 @@ PARSER.add_argument(
     'password', help='This field cannot be blank', required=True)
 
 
+class Index(Resource):
+    def get(self):
+        return {
+            'greeting': 'Hello World'
+        }
+
+
 class UserRegistration(Resource):
     def post(self):
         data = PARSER.parse_args()
@@ -64,7 +71,7 @@ class UserLogoutAccess(Resource):
     def post(self):
         jti = get_raw_jwt()['jti']
         try:
-            revoked_token = RevokedTokenModel(jti=jti)
+            revoked_token = RevokedToken(jti=jti)
             revoked_token.add()
             return {'message': 'Access token has been revoked'}
         except:
@@ -76,7 +83,7 @@ class UserLogoutRefresh(Resource):
     def post(self):
         jti = get_raw_jwt()['jti']
         try:
-            revoked_token = RevokedTokenModel(jti=jti)
+            revoked_token = RevokedToken(jti=jti)
             revoked_token.add()
             return {'message': 'Refresh token has been revoked'}
         except:
