@@ -13,7 +13,7 @@ def index():
     # access the logger with the logger from api.core and uses the standard logging module
     # try using ipdb here :) you can inject yourself
     logger.info("Hello World!")
-    return "<h1>Hello videogame fans!</h1>"
+    return create_response(data={"Greeting": "Hello World"})
 
 
 # function that is called when you visit /persons
@@ -22,6 +22,16 @@ def get_persons():
     persons = Person.query.all()
     return create_response(data={"persons": serialize_list(persons)})
 
+
+@main.route("/recommend", methods=["GET"])
+def get_recommendation():
+    return create_response(data={"hallo": "Welt"})
+
+
+@main.route("/recommend", methods=["POST"])
+def create_recommendation():
+    data = request.get_json()
+    return create_response(data)
 
 # POST request for /persons
 @main.route("/persons", methods=["POST"])

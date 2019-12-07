@@ -4,6 +4,7 @@ import logging
 from flask import Flask, request
 from flask_cors import CORS
 from flask_migrate import Migrate
+from flask_restful import Api
 from sqlalchemy_utils import create_database, database_exists
 
 from api.config import config
@@ -29,6 +30,7 @@ def create_app(test_config=None):
         app.run()
     """
     app = Flask(__name__)
+    api = Api(app)
 
     CORS(app)  # add CORS
 
@@ -43,7 +45,8 @@ def create_app(test_config=None):
         # ignore environment variable config if config was given
         app.config.from_mapping(**test_config)
     else:
-        app.config.from_object(config[env])  # config dict is from api/config.py
+        # config dict is from api/config.py
+        app.config.from_object(config[env])
 
     # logging
     formatter = RequestFormatter(
@@ -73,6 +76,16 @@ def create_app(test_config=None):
 
     # register sqlalchemy to this app
     from api.models import db
+
+    # register RESTful resources
+    from api.resources import resources
+    api.add_resource(resources.UserRegistration, '/registration')
+    api.add_resource(resources.UserLogin, '/login')
+    api.add_resource(resources.UserLogoutAccess, '/logout/access')
+    api.add_resource(resources.UserLogoutRefresh, '/logout/refresh')
+    api.add_resource(resources.TokenRefresh, '/token/refresh')
+    api.add_resource(resources.AllUsers, '/users')
+    api.add_resource(resources.SecretResource, '/secret')
 
     db.init_app(app)  # initialize Flask SQLALchemy with this flask app
     Migrate(app, db)
