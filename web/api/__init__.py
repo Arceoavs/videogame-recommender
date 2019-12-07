@@ -58,26 +58,6 @@ def create_app(test_config=None):
         # config dict is from api/config.py
         app.config.from_object(config[env])
 
-    # logging
-    formatter = RequestFormatter(
-        "%(asctime)s %(remote_addr)s: requested %(url)s: %(levelname)s in [%(module)s: %(lineno)d]: %(message)s"
-    )
-    if app.config.get("LOG_FILE"):
-        fh = logging.FileHandler(app.config.get("LOG_FILE"))
-        fh.setLevel(logging.DEBUG)
-        fh.setFormatter(formatter)
-        app.logger.addHandler(fh)
-
-    strm = logging.StreamHandler()
-    strm.setLevel(logging.DEBUG)
-    strm.setFormatter(formatter)
-
-    app.logger.addHandler(strm)
-    app.logger.setLevel(logging.DEBUG)
-
-    root = logging.getLogger("core")
-    root.addHandler(strm)
-
     # decide whether to create database
     if env != "prod":
         db_url = app.config["SQLALCHEMY_DATABASE_URI"]
@@ -99,12 +79,6 @@ def create_app(test_config=None):
 
     db.init_app(app)  # initialize Flask SQLALchemy with this flask app
     Migrate(app, db)
-
-    # import and register blueprints
-    from api.views import main
-
-    # why blueprints http://flask.pocoo.org/docs/1.0/blueprints/
-    app.register_blueprint(main.main)
 
     # register error Handler
     app.register_error_handler(Exception, all_exception_handler)
