@@ -20,3 +20,6 @@ creds.ini
 # outdated database mounts
 .pgdatabase
 pgdatabase
+
+# If PyCharm is used
+.idea
