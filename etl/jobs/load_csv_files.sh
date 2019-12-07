@@ -16,3 +16,9 @@ python ./transformations/load_igdb_themes.py
 
 python ./transformations/load_metacritic_games.py
 python ./transformations/load_metacritic_user_comments.py
+
+python ./transformations/create_giantbomb_games_view.py
+python ./transformations/create_igdb_games_view.py
+python ./transformations/create_core_games.py
+python ./transformations/create_core_users.py
+python ./transformations/create_core_reviews.py
