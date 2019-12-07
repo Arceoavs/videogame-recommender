@@ -1,7 +1,6 @@
 from flask import Blueprint, request
 from api.models import db, Person, Email
 from api.core import create_response, serialize_list, logger
-from sqlalchemy import inspect
 
 main = Blueprint("main", __name__)  # initialize blueprint
 

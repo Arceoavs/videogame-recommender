@@ -5,7 +5,8 @@ from .Email import Email
 from .Person import Person
 from .base import db
 from .User import User
+from .RevokedToken import RevokedToken
 
-__all__ = ["Email", "Person", "db", "User"]
+__all__ = ["Email", "Person", "db", "User", "RevokedToken"]
 
 # You must import all of the new Models you create to this page
