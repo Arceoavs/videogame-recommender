@@ -41,6 +41,20 @@ services:
     volumes:
       - ./web:/web:z
     restart: always
+  client: 
+    build: 
+      context: ./client
+      # Dockerfile for production:
+      # dockerfile: Dockerfile 
+      dockerfile: dev.Dockerfile
+    depends_on: 
+      - web
+    ports: 
+      - 8080:8080
+    volumes:
+      - './client:/client:z'
+      - '/client/node_modules'
+    restart: always
 
 volumes:
   postgresdb:
