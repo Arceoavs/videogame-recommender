@@ -3,21 +3,22 @@ v-app(:style="{background: $vuetify.theme.themes[theme].background}")
   Navbar
   v-content
     router-view
+  Footer
 </template>
 
 <script>
 
 import Navbar from './components/navigation/Navbar'
+import Footer from './components/Footer'
 
 export default {
   name: 'App',
-  components: { Navbar },
+  components: { Navbar, Footer },
   data: () => ({
     //
   }),
   computed: {
     theme () {
-      console.log(this.$vuetify.theme.themes['dark'])
       return this.$vuetify.theme.dark ? 'dark' : 'light'
     }
   }
