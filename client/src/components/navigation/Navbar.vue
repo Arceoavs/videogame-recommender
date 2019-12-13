@@ -1,5 +1,5 @@
 <template lang="pug">
-v-app-bar(app color="dp2")
+v-app-bar(app color="dp1" dense)
   v-app-bar-nav-icon.hidden-md-and-up(@click.stop="$emit('drawer', true)")
   v-toolbar-title
     //- v-img(src="@/assets/logos/logo-watchtrainer-white.png"
