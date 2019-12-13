@@ -6,13 +6,13 @@ v-app-bar(app color="dp2")
       max-height="30px"
       contain)
   v-spacer
+  v-divider(vertical, inset)
   v-toolbar-items.hidden-sm-and-down
     v-btn(v-for="item in items"
       :key="item.tag"
       text
       :to="item.to")
       | {{item.tag}}
-  v-divider(vertical, inset)
 </template>
 
 <script>
