@@ -1,4 +1,4 @@
-# Development
+# Production
 
 version: "3.7"
 services:
@@ -31,13 +31,9 @@ services:
   web:
     build:
       context: ./web
-      dockerfile: Dockerfile-dev
+      dockerfile: Dockerfile
     depends_on:
       - postgres
-    entrypoint:
-      - /web/scripts/docker_script.sh
-    environment:
-      - FLASK_ENV=docker
     ports:
       - 5000:5000
     volumes:
@@ -46,13 +42,11 @@ services:
   client: 
     build: 
       context: ./client
-      # Dockerfile for production:
-      # dockerfile: Dockerfile 
-      dockerfile: dev.Dockerfile
+      dockerfile: Dockerfile 
     depends_on: 
       - web
     ports: 
-      - 8080:8080
+      - 80:80
     volumes:
       - './client:/client:z'
       - '/client/node_modules'

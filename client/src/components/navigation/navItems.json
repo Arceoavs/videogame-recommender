@@ -1,0 +1,32 @@
+[
+  {
+    "tag": "rate",
+    "to": "rate",
+    "icon": "mdi-start",
+    "loggedIn": true
+  },
+  {
+    "tag": "recommend",
+    "to": "recommend",
+    "icon": "mdi-plus-box",
+    "loggedIn": true
+  },
+  {
+    "tag": "register",
+    "to": "register",
+    "icon": "mdi-register",
+    "loggedIn": true
+  },
+  {
+    "tag": "login",
+    "to": "login",
+    "icon": "mdi-login",
+    "loggedIn": false
+  },
+  {
+    "tag": "logout",
+    "to": "logout",
+    "icon": "mdi-logout",
+    "loggedIn": true
+  }
+]
