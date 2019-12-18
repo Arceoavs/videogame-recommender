@@ -66,18 +66,24 @@ with engine.connect() as connection:
 
   print(mc)
 
-  print(f'Found ${len(mc)} potential matching candidates')
+  print(f'Found {len(mc)} potential matching candidates')
   #mc.to_sql('game_candidates_0_5_gt', engine, schema='matching', if_exists='replace', index_label='key')
 
 
   mc = mc[mc.igdb_year == mc.giantbomb_year]
-  print(f'After year cleaning ${len(mc)} potential matching candidates')
+  print(f'After year cleaning {len(mc)} potential matching candidates')
 
 
-  first_igdb = mc.groupby(mc.igdb_id) #.sort_values(_sim_score, ascending=False).first()
-  print(first_igdb.head(10))
+  i_best = mc[['igdb_id', '_sim_score']].sort_values('_sim_score', ascending=False).groupby(mc.igdb_id).first()
+  g_best = mc[['giantbomb_id', '_sim_score']].sort_values('_sim_score', ascending=False).groupby(mc.giantbomb_id).first()
+  # TODO: mc = mc[mc.igdb_id = mc.loc() ]
+  # lambda row => i_best.getRow(row.igdb_id).similarity = row.similarity && äqualivant zu giantbomb
 
-  print(mc.head(20))
+
+  #print(highest_igdb.head(100))
+  #highest_igdb.to_sql('test_highestigdb', engine, schema='matching', if_exists='replace', index_label='key')
+
+  #print(mc.head(20))
   #mc.to_sql('filtered_game_candidates', engine, schema='matching', if_exists='replace', index_label='key')
 
   connection.close()
