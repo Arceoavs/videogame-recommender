@@ -70,13 +70,19 @@ with engine.connect() as connection:
   #mc.to_sql('game_candidates_0_5_gt', engine, schema='matching', if_exists='replace', index_label='key')
 
 
-  mc = mc[mc.igdb_year == mc.giantbomb_year]
+  mc = mc[abs(mc.igdb_year-mc.giantbomb_year)<=1]
   print(f'After year cleaning {len(mc)} potential matching candidates')
 
 
-  i_best = mc[['igdb_id', '_sim_score']].sort_values('_sim_score', ascending=False).groupby(mc.igdb_id).first()
-  g_best = mc[['giantbomb_id', '_sim_score']].sort_values('_sim_score', ascending=False).groupby(mc.giantbomb_id).first()
+  i_best = mc[['igdb_id', '_sim_score']].sort_values('_sim_score', ascending=False).groupby(mc.igdb_id, as_index=False).first()
+  g_best = mc[['giantbomb_id', '_sim_score']].sort_values('_sim_score', ascending=False).groupby(mc.giantbomb_id, as_index=False).first()
   # TODO: mc = mc[mc.igdb_id = mc.loc() ]
+
+  mc=pd.merge(pd.merge(mc, i_best, on='igdb_id', suffixes=('_mc', '_i')), g_best, on='giantbomb_id')
+  print(f'Joining results in {len(mc)} matches')
+  mc=mc[(mc._sim_score_mc == mc._sim_score_i) & (mc._sim_score_mc == mc._sim_score)]
+  print(f'After choosing top matches per id we have {len(mc)} matches')
+
   # lambda row => i_best.getRow(row.igdb_id).similarity = row.similarity && äqualivant zu giantbomb
 
 
