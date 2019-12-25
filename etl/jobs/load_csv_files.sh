@@ -1,6 +1,7 @@
 #!/bin/sh
 python ./transformations/load_giantbomb_games.py
 python ./transformations/load_giantbomb_releases.py
+python ./transformations/load_giantbomb_platforms.py
 python ./transformations/load_giantbomb_user_reviews.py
 
 python ./transformations/load_igdb_alternative_names.py
