@@ -57,6 +57,7 @@ with engine.connect() as connection:
     integrated_publishers.to_sql('integrated_publishers', engine, schema='public', if_exists='replace', index=False)
 
 
+
     connection.close()
 
     print(tabulate(integrated_publishers.head(10)))
