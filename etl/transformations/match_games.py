@@ -2,154 +2,63 @@ import py_stringsimjoin as ssj
 import py_stringmatching as sm
 import pandas as pd
 
-from utilities import engine
 from game_tokenizer import GameTokenizer
+from queries import select_giantbomb_games, select_igdb_games
+from utilities import engine
+
+
+tokenizer_threshold = 0.5
+max_year_diff = 3
+
+
+def apply_year_filter(df, left_suffix, right_suffix):
+  new_df = df[
+    abs(df[f'{left_suffix}_year']-df[f'{right_suffix}_year'])<=max_year_diff | 
+    df[f'{left_suffix}_year'].isnull() |
+    df[f'{right_suffix}_year'].isnull()
+    ]
+  print(f'[Year Filter] Before     {len(df)}')
+  print(f'[Year Filter] Filtered   {len(df) - len(new_df)}')
+  print(f'[Year Filter] After      {len(new_df)}')
+  print(' ')
+  return new_df
+
 
 with engine.connect() as connection:
-  igdb_games = pd.read_sql_query(
-    ''' 
-    SELECT * FROM (
-      SELECT 
-        g.id,
-        trim(unnest(array_append(a.alternative_names, g.name))) as title,
-        EXTRACT('YEAR' FROM g.first_release_date) as year,
-        array_to_string(g.platforms, ', ') as platforms
-      FROM igdb.stage_games g
-      LEFT JOIN (
-        SELECT game as game_id, array_agg(name) as alternative_names FROM igdb.stage_alternative_names GROUP BY 1
-      ) a ON g.id = a.game_id
-    ) g WHERE platforms IS NOT null OR year IS NOT null;
-    ''',
-    connection
-  )
-
-  giantbomb_games = pd.read_sql_query(
-    ''' 
-    SELECT * FROM (
-      SELECT 
-        id, 
-        trim(unnest(array_append(string_to_array(aliases, ','), g.game_name))) as title, 
-        year,
-        g.platform as platforms 
-      FROM giantbomb.stage_games g
-      LEFT JOIN (SELECT game_id, EXTRACT('YEAR' FROM min(release_date)) as year from giantbomb.stage_releases GROUP BY 1) r
-      ON g.id = r.game_id
-    ) g WHERE title IS NOT null AND title <> '' AND (platforms IS NOT null OR year IS NOT null);
-    ''',
-    connection
-  )
-
+  igdb_games = select_igdb_games(connection)
+  giantbomb_games = select_giantbomb_games(connection)
+  
   igdb_games['key'] = range(0, len(igdb_games))
   giantbomb_games['key'] = range(0, len(giantbomb_games))
 
+  print('[Data Profiling]')
   print(ssj.profile_table_for_join(igdb_games))
   print(ssj.profile_table_for_join(giantbomb_games))
-
-  # porter = PorterStemmer()
-  # metacritic_genres['stem'] = metacritic_genres.name.apply(lambda s: porter.stem(s))
-  # print(metacritic_genres.head(10))
-
-  # igdb_genres['stem'] = igdb_genres.name.apply(lambda s: porter.stem(s))
-  # print(igdb_genres.head(21))
-  # # ws = sm.WhitespaceTokenizer(return_set=True)
+  print(' ')
 
   gt = GameTokenizer()
 
-  mc = ssj.jaccard_join(
+  candidates = ssj.jaccard_join(
     igdb_games, giantbomb_games, 
     'key', 'key', 
     'title', 'title', 
-    gt, 0.5, 
+    gt, tokenizer_threshold, 
     l_out_attrs=['id', 'title', 'year', 'platforms'], r_out_attrs=['id', 'title', 'year', 'platforms'],
     l_out_prefix='igdb_', r_out_prefix='giantbomb_'
   )
+  print(f'[Match games] {len(candidates)} potential matching candidates')
 
-  print(mc)
+  candidates = apply_year_filter(candidates, 'igdb', 'giantbomb')
 
-  print(f'Found {len(mc)} potential matching candidates')
-  #mc.to_sql('game_candidates_0_5_gt', engine, schema='matching', if_exists='replace', index_label='key')
+  i_best = candidates[['igdb_id', '_sim_score']].sort_values('_sim_score', ascending=False).groupby(candidates.igdb_id, as_index=False).first()
+  g_best = candidates[['giantbomb_id', '_sim_score']].sort_values('_sim_score', ascending=False).groupby(candidates.giantbomb_id, as_index=False).first()
 
+  candidates=pd.merge(pd.merge(candidates, i_best, on='igdb_id', suffixes=('_candidates', '_i')), g_best, on='giantbomb_id')
+  print(f'Joining results in {len(candidates)} matches')
+  candidates=candidates[(candidates._sim_score_candidates == candidates._sim_score_i) & (candidates._sim_score_candidates == candidates._sim_score)]
+  print(f'After choosing top matches per id we have {len(candidates)} matches')
 
-  mc = mc[abs(mc.igdb_year-mc.giantbomb_year)<=1]
-  print(f'After year cleaning {len(mc)} potential matching candidates')
-
-
-  i_best = mc[['igdb_id', '_sim_score']].sort_values('_sim_score', ascending=False).groupby(mc.igdb_id, as_index=False).first()
-  g_best = mc[['giantbomb_id', '_sim_score']].sort_values('_sim_score', ascending=False).groupby(mc.giantbomb_id, as_index=False).first()
-  # TODO: mc = mc[mc.igdb_id = mc.loc() ]
-
-  mc=pd.merge(pd.merge(mc, i_best, on='igdb_id', suffixes=('_mc', '_i')), g_best, on='giantbomb_id')
-  print(f'Joining results in {len(mc)} matches')
-  mc=mc[(mc._sim_score_mc == mc._sim_score_i) & (mc._sim_score_mc == mc._sim_score)]
-  print(f'After choosing top matches per id we have {len(mc)} matches')
-
-  # lambda row => i_best.getRow(row.igdb_id).similarity = row.similarity && äqualivant zu giantbomb
-
-
-  #print(highest_igdb.head(100))
-  #highest_igdb.to_sql('test_highestigdb', engine, schema='matching', if_exists='replace', index_label='key')
-
-  #print(mc.head(20))
-  #mc.to_sql('filtered_game_candidates', engine, schema='matching', if_exists='replace', index_label='key')
+  print(candidates.head(20))
+  candidates.to_sql('filtered_game_candidates', engine, schema='matching', if_exists='replace', index_label='key')
 
   connection.close()
-
-
-
-  # # print("######")
-  # # output_pairs2 = ssj.edit_distance_join(
-  # #   metacritic_genres, igdb_genres, 
-  # #   'id', 'id', 
-  # #   'name', 'name', 
-  # #   3, 
-  # #   l_out_attrs=['name'], r_out_attrs=['name']
-  # # )
-  # # print(output_pairs2)
-  # print("######")
-  # matching_pairs = ssj.edit_distance_join(
-  #   metacritic_genres, igdb_genres, 
-  #   'id', 'id', 
-  #   'stem', 'stem', 
-  #   0, 
-  #   l_out_attrs=['stem', 'name'], r_out_attrs=['stem', 'name'],
-  #   l_out_prefix='metacritic_', r_out_prefix='igdb_'
-  # )
-  # print(matching_pairs)
-
-  # # merged = pd.merge(
-  # #   metacritic_genres, matching_pairs, left_on='name', right_on='metacritic_name', how='left'
-  # #   ).merge(
-  # #     igdb_genres, left_on='igdb_id', right_on='id', how='outer'
-  # #   )
-  # # print(merged.head(200))
-
-  # # merged = matching_pairs.merge(
-  # #     metacritic_genres, left_on='metacritic_name', right_on='name', how='outer'
-  # #   ).merge(
-  # #     igdb_genres, left_on='igdb_id', right_on='id', how='outer'
-  # #   )
-
-  # metacritic_merged = matching_pairs.merge(
-  #   metacritic_genres, left_on='metacritic_name', right_on='name', how='outer'
-  # )
-  # metacritic_merged['metacritic_name'] = metacritic_merged['name']
-    
-  # igdb_merged = matching_pairs.merge(
-  #   igdb_genres, left_on='igdb_id', right_on='id', how='outer'
-  # )
-  # igdb_merged['igdb_id'] = igdb_merged['id']
-  # igdb_merged = igdb_merged[igdb_merged.metacritic_name.isnull()]
-
-  # print(igdb_merged.head(21))
-
-  # merged = pd.concat([metacritic_merged, igdb_merged], sort=False, ignore_index=True)
-
-  # merged.to_sql('test_genres', engine, if_exists='replace', index=False)
-
-
-  # merged = merged[['name', 'igdb_id', 'metacritic_name']]
-
-  # print(merged.tail(20))
-
-  # merged.to_sql('dim_genres', engine, schema='dimension', if_exists='replace', index_label='id')
-  # connection.close()
