@@ -132,4 +132,19 @@ with engine.connect() as connection:
 
   merged_lookup.to_sql('platforms', engine, schema='lookup', if_exists='replace', index=False)
 
+  ### CREATE FACT TABLE
+
+  connection.execute(
+    """
+    DROP TABLE IF EXISTS platforms;
+    CREATE TABLE platforms (
+      id int NOT NULL PRIMARY KEY,
+      name varchar(255)
+    );
+    INSERT INTO platforms
+    SELECT id, name
+    FROM lookup.platforms;
+    """
+  )
+
   connection.close()
