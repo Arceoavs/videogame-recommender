@@ -39,6 +39,8 @@ with engine.connect() as connection:
   g_platforms['name'] = g_platforms['name'].str.replace(" ", "")
   i_platforms['name'] = i_platforms['name'].str.replace(" ", "")
 
+  i_platforms.loc[i_platforms.name == 'NintendoGameCube', 'name'] = 'GameCube'
+
   matching_pairs = ssj.edit_distance_join(
     g_platforms, i_platforms, 
     'id', 'id', 
