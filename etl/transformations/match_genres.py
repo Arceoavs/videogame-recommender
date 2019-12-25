@@ -54,7 +54,7 @@ with engine.connect() as connection:
     metacritic_genres, left_on='metacritic_name', right_on='name', how='outer'
   )
   metacritic_merged['metacritic_name'] = metacritic_merged['name']
-    
+
   igdb_merged = matching_pairs.merge(
     igdb_genres, left_on='igdb_id', right_on='id', how='outer'
   )
