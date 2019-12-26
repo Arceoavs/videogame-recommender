@@ -4,24 +4,36 @@ import pandas as pd
 
 from game_tokenizer import GameTokenizer
 from queries import select_giantbomb_games, select_igdb_games
-from utilities import engine
+from utilities import engine, numbers as nb
 
 
 tokenizer_threshold = 0.5
 max_year_diff = 3
 
 
-def apply_year_filter(df, left_suffix, right_suffix):
+def apply_year_filter(df, left_prefix, right_prefix):
   new_df = df[
-    abs(df[f'{left_suffix}_year']-df[f'{right_suffix}_year'])<=max_year_diff | 
-    df[f'{left_suffix}_year'].isnull() |
-    df[f'{right_suffix}_year'].isnull()
+    abs(df[f'{left_prefix}_year']-df[f'{right_prefix}_year'])<=max_year_diff | 
+    df[f'{left_prefix}_year'].isnull() |
+    df[f'{right_prefix}_year'].isnull()
     ]
   print(f'[Year Filter] Before     {len(df)}')
   print(f'[Year Filter] Filtered   {len(df) - len(new_df)}')
   print(f'[Year Filter] After      {len(new_df)}')
   print(' ')
   return new_df
+
+
+def apply_last_number_filter(df, left_prefix, right_prefix):
+  print(f'[Last Number Filter] Before     {len(df)}')
+  for index, row in df.iterrows():
+    s1 = row[f'{left_prefix}_title'].split(' ')[-1]
+    s2 = row[f'{right_prefix}_title'].split(' ')[-1]
+    if nb.is_number(s1) and nb.is_number(s2) and not nb.equal_numbers(s1, s2):
+      df.drop(index, inplace=True)
+  print(f'[Last Number Filter] After      {len(df)}')
+  print(' ')
+  return df
 
 
 with engine.connect() as connection:
@@ -49,6 +61,7 @@ with engine.connect() as connection:
   print(f'[Match games] {len(candidates)} potential matching candidates')
 
   candidates = apply_year_filter(candidates, 'igdb', 'giantbomb')
+  candidates = apply_last_number_filter(candidates, 'igdb', 'giantbomb')
 
   i_best = candidates[['igdb_id', '_sim_score']].sort_values('_sim_score', ascending=False).groupby(candidates.igdb_id, as_index=False).first()
   g_best = candidates[['giantbomb_id', '_sim_score']].sort_values('_sim_score', ascending=False).groupby(candidates.giantbomb_id, as_index=False).first()
