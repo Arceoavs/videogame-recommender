@@ -5,10 +5,11 @@ v-app-bar(app color="dp1" dense)
       v-app-bar-nav-icon.hidden-md-and-up(
         @click.stop="$emit('drawer', true)")
     v-col(cols="2")
-      v-img(src="@/assets/logos/vgrlogo_white.svg"
-        max-height="30px"
-        contain
-        :to="home")
+      router-link(:to="{name: 'home'}")
+        v-img(src="@/assets/logos/vgrlogo_white.svg"
+          max-height="30px"
+          contain
+          :to="home")
   v-spacer
   v-divider(vertical, inset)
   v-toolbar-items.hidden-sm-and-down
