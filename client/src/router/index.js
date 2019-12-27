@@ -37,8 +37,8 @@ const routes = [
     name: 'recommend',
     meta: {
       requiresAuth: true
-    }
-    // component: () => import(/* webpackChunkName: "about" */ '../views/Recommend.vue')
+    },
+    component: () => import(/* webpackChunkName: "recommend" */ '../views/Recommend.vue')
   },
   {
     path: '/rate',
