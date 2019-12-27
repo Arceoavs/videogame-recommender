@@ -8,8 +8,7 @@ v-app-bar(app color="dp1" dense)
       router-link(:to="{name: 'home'}")
         v-img(src="@/assets/logos/vgrlogo_white.svg"
           max-height="30px"
-          contain
-          :to="home")
+          contain)
   v-spacer
   v-divider(vertical, inset)
   v-toolbar-items.hidden-sm-and-down
