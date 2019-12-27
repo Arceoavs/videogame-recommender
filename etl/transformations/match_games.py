@@ -26,14 +26,24 @@ def apply_year_filter(df, left_prefix, right_prefix):
 
 def apply_last_number_filter(df, left_prefix, right_prefix):
   print(f'[Last Number Filter] Before     {len(df)}')
-  for index, row in df.iterrows():
-    s1 = row[f'{left_prefix}_title'].split(' ')[-1]
-    s2 = row[f'{right_prefix}_title'].split(' ')[-1]
-    if nb.is_number(s1) and nb.is_number(s2) and not nb.equal_numbers(s1, s2):
-      df.drop(index, inplace=True)
+  df = df[df.apply(lambda x: not(nb.is_number(x[f'{left_prefix}_title'].split(' ')[-1])
+                                 and nb.is_number(x[f'{right_prefix}_title'].split(' ')[-1])
+                                 and not nb.equal_numbers(x[f'{left_prefix}_title'].split(' ')[-1], x[f'{right_prefix}_title'].split(' ')[-1])),
+                   axis=1)]
   print(f'[Last Number Filter] After      {len(df)}')
   print(' ')
   return df
+
+
+def apply_platform_filter(df, left_prefix, right_prefix):
+  print(f'[Platform Filter] Before     {len(df)}')
+  new_df = df[df.apply(lambda x: not (
+    set(x[f'{left_prefix}_platforms'].split(', ')).isdisjoint(set(x[f'{right_prefix}_platforms'].split(', ')))),
+                       axis=1)]
+
+  print(f'[Platform Filter] After      {len(new_df)}')
+  print(' ')
+  return (new_df)
 
 
 with engine.connect() as connection:
@@ -62,6 +72,7 @@ with engine.connect() as connection:
 
   candidates = apply_year_filter(candidates, 'igdb', 'giantbomb')
   candidates = apply_last_number_filter(candidates, 'igdb', 'giantbomb')
+  candidates = apply_platform_filter(candidates, 'igdb', 'giantbomb')
 
   i_best = candidates[['igdb_id', '_sim_score']].sort_values('_sim_score', ascending=False).groupby(candidates.igdb_id, as_index=False).first()
   g_best = candidates[['giantbomb_id', '_sim_score']].sort_values('_sim_score', ascending=False).groupby(candidates.giantbomb_id, as_index=False).first()
