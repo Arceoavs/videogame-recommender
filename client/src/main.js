@@ -8,7 +8,7 @@ import axios from 'axios'
 
 Vue.config.productionTip = false
 
-const instance = axios.create({ baseURL: process.env.VUE_API_URL })
+const instance = axios.create({ baseURL: process.env.VUE_APP_API_URL })
 instance.defaults.headers.common['Authorization'] = 'Bearer' + localStorage.getItem('authToken')
 Vue.prototype.$http = instance
 
