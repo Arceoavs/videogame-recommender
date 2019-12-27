@@ -23,3 +23,5 @@ pgdatabase
 
 # If PyCharm is used
 .idea
+
+.env
