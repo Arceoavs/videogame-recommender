@@ -4,8 +4,13 @@ import './registerServiceWorker'
 import router from './router'
 import store from './store'
 import vuetify from './plugins/vuetify'
+import axios from 'axios'
 
 Vue.config.productionTip = false
+
+const instance = axios.create({ baseURL: process.env.VUE_API_URL })
+instance.defaults.headers.common['Authorization'] = 'Bearer' + localStorage.getItem('authToken')
+Vue.prototype.$http = instance
 
 new Vue({
   router,
