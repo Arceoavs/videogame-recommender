@@ -1,8 +1,10 @@
 <template lang="pug">
-v-img(:aspect-ratio="4/3" src="../assets/vgr.png")
-  v-container(fluid)
+v-img(:aspect-ratio="4/3"
+  src="../assets/background.jpg"
+  gradient="0.25turn, rgba(0,0,0,1) 40%, rgba(0,0,0,0)")
+  v-container
     v-row
-      v-col(md="4" sm="6" cols="8")
+      v-col(sm="6" cols="10")
         v-row.mt-10(justify="start")
           v-col
             //- md and up
