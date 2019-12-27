@@ -26,8 +26,11 @@
 
   v-row(justify="start")
     v-col(align="end")
-      v-btn.mr-4 Register
-      v-btn Login
+      v-btn.mr-4(:to="{name: 'register'}")
+        | Register
+      v-btn.black--text(@click="login"
+        color="secondary")
+        | Login
 </template>
 
 <script>
@@ -45,8 +48,14 @@ export default {
     }
   },
   methods: {
-    login () {
-
+    async login () {
+      const username = this.email; const password = this.password
+      try {
+        await this.$store.dispatch('login', { username, password })
+        this.$router.push({ name: 'recommend' })
+      } catch (err) {
+        console.login(err)
+      }
     }
   }
 }

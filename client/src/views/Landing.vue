@@ -46,13 +46,20 @@ v-img(:aspect-ratio="4/3"
               | This is your life now.
               | Enjoy.
 
-        Login
+        Register(v-if="showRegister")
+        Login(v-else)
 </template>
 
 <script>
 import Login from '@/components/authentication/Login'
+import Register from '@/components/authentication/Register'
+
 export default {
   name: 'Landing',
-  components: { Login }
+  components: { Login, Register },
+  props: {
+    showLogin: { type: Boolean, default: false },
+    showRegister: { type: Boolean, default: false }
+  }
 }
 </script>
