@@ -1,14 +1,9 @@
 import configparser
-import logging
 from typing import Tuple, List
 
 from werkzeug.local import LocalProxy
 from flask import current_app, jsonify
 from flask.wrappers import Response
-
-# logger object for all views to use
-logger = LocalProxy(lambda: current_app.logger)
-core_logger = logging.getLogger("core")
 
 
 class Mixin:
