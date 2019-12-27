@@ -15,7 +15,7 @@
     "tag": "register",
     "to": "register",
     "icon": "mdi-register",
-    "loggedIn": true
+    "loggedIn": false
   },
   {
     "tag": "login",
