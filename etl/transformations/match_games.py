@@ -85,4 +85,24 @@ with engine.connect() as connection:
   print(candidates.head(20))
   candidates.to_sql('filtered_game_candidates', engine, schema='matching', if_exists='replace', index_label='key')
 
+  n_G_IDs = candidates.groupby('igdb_id', as_index=False).agg({'giantbomb_id': pd.Series.nunique})
+  n_I_IDs = candidates.groupby('giantbomb_id', as_index=False).agg({'igdb_id': pd.Series.nunique})
+
+  mult_G_IDs = n_G_IDs[n_G_IDs['giantbomb_id'] > 1]
+  mult_I_IDs = n_I_IDs[n_I_IDs['igdb_id'] > 1]
+
+  candidates_1_to_1 = candidates[
+    (~candidates.igdb_id.isin(mult_G_IDs.igdb_id)) & (~candidates.giantbomb_id.isin(mult_I_IDs.giantbomb_id))][
+    ['igdb_id', 'giantbomb_id']].groupby('igdb_id', as_index=False).agg({'giantbomb_id': min})
+
+  igdb_name_lookup = pd.read_sql_query('''select id, name from igdb.stage_games''', connection)
+  giantbomb_name_lookup = pd.read_sql_query('''select id, game_name from giantbomb.stage_games''', connection)
+
+  lookup_games=(candidates_1_to_1.merge(igdb_name_lookup, left_on='igdb_id', right_on='id', how='inner')
+                .merge(giantbomb_name_lookup, left_on='giantbomb_id', right_on='id', how='inner')
+                [['igdb_id', 'giantbomb_id', 'name', 'game_name']]
+                .rename(columns={"name":"igdb_title", "game_name":"giantbomb_title"}))
+
+  lookup_games.to_sql("games", engine, schema="lookup", if_exists="replace", index_label='id')
+
   connection.close()
