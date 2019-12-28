@@ -45,6 +45,8 @@ services:
       dockerfile: Dockerfile 
     depends_on: 
       - web
+    env_file:
+      - .env
     ports: 
       - 80:80
     volumes:
