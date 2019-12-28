@@ -48,7 +48,7 @@ with engine.connect() as connection:
 
     matching_publishers.to_sql('publishers', engine, schema='matching', if_exists='replace', index=False)
 
-# #renaming the columns to similar name in both dataframes
+# renaming the columns to similar and dissimilar names in both dataframes
 
     integrated_publishers = pd.concat([metacritic_publishers, igdb_publishers], join="outer",
                                       ignore_index=True, keys=None, levels=None, names=None, verify_integrity=False,
@@ -56,11 +56,19 @@ with engine.connect() as connection:
 
     integrated_publishers.to_sql('integrated_publishers', engine, schema='public', if_exists='replace', index=False)
 
+    # connection.execute(
+    #     """
+    #     ALTER TABLE integrated_publishers ADD PRIMARY KEY (ID);
+    #     """
+    #     )
 
 
     connection.close()
 
-    print(tabulate(integrated_publishers.head(10)))
-    print(tabulate(igdb_publishers.head(10)))
-    print(tabulate(matching_publishers.head(10)))
+
+    # print(tabulate(igdb_publishers.head(10)))
+    # print(tabulate(matching_publishers.head(10)))
+    # print(matching_publishers)
+    # print("integrated publichers")
+    # print(tabulate(integrated_publishers.head(10)))
 
