@@ -7,14 +7,14 @@
   v-row(justify="start")
     v-col
       v-text-field(v-model="email"
-        color="primary_var"
+        color="primary"
         prepend-inner-icon="mdi-email"
         label="E-Mail"
         hide-details)
 
   v-row(justify="start")
     v-col
-      v-text-field(color="primary_var"
+      v-text-field(color="primary"
         prepend-inner-icon="mdi-lock"
         label="Password"
         v-model="password"
@@ -29,7 +29,7 @@
       v-btn.mr-4(:to="{name: 'login'}")
         | To Login
       v-btn.black--text(@click="register"
-        color="secondary")
+        color="primary")
         | Register
 </template>
 
