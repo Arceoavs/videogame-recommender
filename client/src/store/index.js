@@ -22,10 +22,8 @@ export default new Vuex.Store({
       state.token = token
       Vue.prototype.$http.defaults.headers.common['Authorization'] = `Bearer ${token}`
       localStorage.setItem('token', token)
-      console.log('success')
     },
     authError (state, err) {
-      console.log(err)
       state.status = err
     },
     logout (state) {
