@@ -3,7 +3,7 @@ import py_stringmatching as sm
 import pandas as pd
 
 from game_tokenizer import GameTokenizer
-from queries import select_giantbomb_games, select_igdb_games
+from queries import select_giantbomb_games, select_igdb_games, select_metacritic_games, select_i_g_lookup_games
 from utilities import engine, numbers as nb
 
 
@@ -104,5 +104,10 @@ with engine.connect() as connection:
                 .rename(columns={"name":"igdb_title", "game_name":"giantbomb_title"}))
 
   lookup_games.to_sql("games", engine, schema="lookup", if_exists="replace", index_label='id')
+
+  metacritic_games = select_metacritic_games.select_metacritic_games(connection) #TODO why does this not work like above without xxx.xxx?
+
+
+  i_g_lookup_games = select_i_g_lookup_games.select_i_g_lookup_games(connection)
 
   connection.close()
