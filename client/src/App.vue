@@ -3,6 +3,7 @@ v-app(:style="{background: $vuetify.theme.themes[theme].background}")
   Navbar
   v-content
     router-view
+    Confirmation
   Footer
 </template>
 
@@ -10,10 +11,11 @@ v-app(:style="{background: $vuetify.theme.themes[theme].background}")
 
 import Navbar from './components/navigation/Navbar'
 import Footer from './components/Footer'
+import Confirmation from '@/components/authentication/SnackMessage'
 
 export default {
   name: 'App',
-  components: { Navbar, Footer },
+  components: { Navbar, Footer, Confirmation },
   computed: {
     theme () {
       return this.$vuetify.theme.dark ? 'dark' : 'light'

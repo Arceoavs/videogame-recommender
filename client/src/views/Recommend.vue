@@ -5,8 +5,8 @@
 <script>
 export default {
   async mounted () {
-    const res = await this.$http.post('/register')
-    console.log(res)
+    const res = await this.$http.get('/secret')
+    console.log(res.data)
   }
 }
 </script>

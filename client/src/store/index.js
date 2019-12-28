@@ -5,19 +5,27 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    statis: '',
+    showSnackbar: false,
+    status: '',
     token: localStorage.getItem('token') || '',
     user: {}
   },
   mutations: {
+    toggleSnackbar (state) {
+      state.showSnackbar = true
+    },
     authRequest (state) {
       state.status = 'loading'
     },
     authSuccess (state, token) {
       state.status = 'success'
       state.token = token
+      Vue.prototype.$http.defaults.headers.common['Authorization'] = `Bearer ${token}`
+      localStorage.setItem('token', token)
+      console.log('success')
     },
     authError (state, err) {
+      console.log(err)
       state.status = err
     },
     logout (state) {
@@ -31,24 +39,26 @@ export default new Vuex.Store({
       try {
         const res = await Vue.prototype.$http.post('/login', user)
         const token = res.data.access_token
-        localStorage.setItem('token', token)
         commit('authSuccess', token)
       } catch (err) {
-        commit('authError', err)
+        commit('authError', err.message)
         localStorage.removeItem('token')
+      } finally {
+        commit('toggleSnackbar')
       }
     },
 
     async register ({ commit }, user) {
       commit('authRequest')
       try {
-        const res = await Vue.prototype.$http.post('/register', user)
+        const res = await Vue.prototype.$http.post('/registration', user)
         const token = res.data.access_token
-        localStorage.setItem('token', token)
         commit('authSuccess', token)
       } catch (err) {
         commit('authError', err)
         localStorage.removeItem('token')
+      } finally {
+        commit('toggleSnackbar')
       }
     },
 
