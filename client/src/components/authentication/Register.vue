@@ -50,13 +50,9 @@ export default {
   },
   methods: {
     async register () {
-      const email = this.email; const password = this.password
-      try {
-        this.$store.dispatch('register', { email, password })
-        this.$router.push({ name: 'recommend' })
-      } catch (err) {
-        console.log(err)
-      }
+      const username = this.email; const password = this.password
+      this.$store.dispatch('register', { username, password })
+      this.$router.push({ name: 'recommend' })
     }
   }
 }

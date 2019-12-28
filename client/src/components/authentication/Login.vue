@@ -34,6 +34,7 @@
 </template>
 
 <script>
+
 export default {
   name: 'Login',
   data () {
@@ -50,12 +51,8 @@ export default {
   methods: {
     async login () {
       const username = this.email; const password = this.password
-      try {
-        await this.$store.dispatch('login', { username, password })
-        this.$router.push({ name: 'recommend' })
-      } catch (err) {
-        console.login(err)
-      }
+      await this.$store.dispatch('login', { username, password })
+      this.$router.push({ name: 'recommend' })
     }
   }
 }
