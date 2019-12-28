@@ -13,7 +13,7 @@ v-app-bar(app color="dp1" dense)
   v-divider(vertical, inset)
   v-toolbar-items.hidden-sm-and-down
     v-btn(v-for="item in items"
-      v-if="item.loggedIn"
+      v-if="item.loggedIn === $store.getters.loggedIn"
       :key="item.tag"
       text
       :to="item.to")
