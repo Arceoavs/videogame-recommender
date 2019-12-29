@@ -38,6 +38,7 @@ services:
       - /web/scripts/docker_script.sh
     environment:
       - FLASK_ENV=docker
+      - DATABASE_URL=${DATABASE_URL}
     ports:
       - 5000:5000
     volumes:
@@ -46,8 +47,6 @@ services:
   client: 
     build: 
       context: ./client
-      # Dockerfile for production:
-      # dockerfile: Dockerfile 
       dockerfile: dev.Dockerfile
     depends_on: 
       - web
