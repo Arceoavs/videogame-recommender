@@ -1,14 +1,19 @@
 import py_stringsimjoin as ssj
 import py_stringmatching as sm
+import numpy as np
 import pandas as pd
+import sqlalchemy
 
-from game_tokenizer import GameTokenizer
-from queries import select_giantbomb_games, select_igdb_games, select_metacritic_games, select_i_g_lookup_games
+from game_tokenizer import GameTokenizer, clean_string
+from queries import select_giantbomb_games, select_igdb_games, select_metacritic_games, select_game_matches, select_unmatched_giantbomb_games, select_unmatched_metacritic_games
 from utilities import engine, numbers as nb
 
 
 tokenizer_threshold = 0.5
 max_year_diff = 3
+
+
+lev = sm.Levenshtein()
 
 
 def apply_year_filter(df, left_prefix, right_prefix):
@@ -46,21 +51,70 @@ def apply_platform_filter(df, left_prefix, right_prefix):
   return (new_df)
 
 
+def find_best_matches(candidates, left, right):
+  new_candidates = candidates
+  grouped = candidates.groupby(f'{right}_id').filter(lambda x: len(x) > 1).groupby(f'{right}_id')
+  for name, group in grouped:
+    highest_sim = 0.0
+    sim_item = None
+    for index, row in group.iterrows():
+      current_item = row[f'{right}_id']
+      sim = lev.get_sim_score(clean_string(row[f'{left}_title']), clean_string(row[f'{right}_title']))
+      if sim > highest_sim:
+        highest_sim = sim
+        if sim_item is not None:
+          new_candidates = new_candidates[(new_candidates[f'{right}_id'] != current_item) & (new_candidates[f'{left}_id'] != sim_item)]
+        sim_item = row[f'{left}_id']
+  return new_candidates
+
+
+def process_candidates(candidates, left, right):
+  print(f'[Match {left}-{right} games] {len(candidates)} potential matching candidates')
+
+  candidates = apply_year_filter(candidates, left, right)
+  candidates = apply_last_number_filter(candidates, left, right)
+  candidates = apply_platform_filter(candidates, left, right)
+
+  left_best = candidates[[f'{left}_id', '_sim_score']].sort_values('_sim_score', ascending=False).groupby(candidates[f'{left}_id'], as_index=False).first()
+  right_best = candidates[[f'{right}_id', '_sim_score']].sort_values('_sim_score', ascending=False).groupby(candidates[f'{right}_id'], as_index=False).first()
+  
+  candidates=pd.merge(pd.merge(candidates, left_best, on=f'{left}_id', suffixes=(f'_candidates', f'_{left}')), right_best, on=f'{right}_id')
+  print(f'[Match {left}-{right} games] {len(candidates)} matches after joining results')
+  candidates=candidates[(candidates._sim_score_candidates == candidates[f'_sim_score_{left}']) & (candidates._sim_score_candidates == candidates._sim_score)]
+  print(f'[Match {left}-{right} games] {len(candidates)} matches after choosing most similar matches')
+ 
+  candidates = find_best_matches(candidates, left, right)
+  print(f'[Match {left}-{right} games] {len(candidates)} matches after finding the best matches from the most similar matches')
+ 
+  candidates.to_sql(f'{left}_{right}_game_candidates', engine, schema='matching', if_exists='replace', index_label='key')
+  
+  print(f'[Match {left}-{right} games] {len(candidates)} final matches')
+  return candidates
+
+
 with engine.connect() as connection:
   igdb_games = select_igdb_games(connection)
-  giantbomb_games = select_giantbomb_games(connection)
-  
   igdb_games['key'] = range(0, len(igdb_games))
+  
+  giantbomb_games = select_giantbomb_games(connection)
   giantbomb_games['key'] = range(0, len(giantbomb_games))
+
+  metacritic_games = select_metacritic_games(connection)
+  metacritic_games['key'] = range(0, len(metacritic_games))
 
   print('[Data Profiling]')
   print(ssj.profile_table_for_join(igdb_games))
   print(ssj.profile_table_for_join(giantbomb_games))
+  print(ssj.profile_table_for_join(metacritic_games))
   print(' ')
 
   gt = GameTokenizer()
 
-  candidates = ssj.jaccard_join(
+  ###########################
+  ### CREATE MATCHING TABLE ###
+  ###########################
+
+  ig_candidates = ssj.jaccard_join(
     igdb_games, giantbomb_games, 
     'key', 'key', 
     'title', 'title', 
@@ -68,46 +122,82 @@ with engine.connect() as connection:
     l_out_attrs=['id', 'title', 'year', 'platforms'], r_out_attrs=['id', 'title', 'year', 'platforms'],
     l_out_prefix='igdb_', r_out_prefix='giantbomb_'
   )
-  print(f'[Match games] {len(candidates)} potential matching candidates')
-
-  candidates = apply_year_filter(candidates, 'igdb', 'giantbomb')
-  candidates = apply_last_number_filter(candidates, 'igdb', 'giantbomb')
-  candidates = apply_platform_filter(candidates, 'igdb', 'giantbomb')
-
-  i_best = candidates[['igdb_id', '_sim_score']].sort_values('_sim_score', ascending=False).groupby(candidates.igdb_id, as_index=False).first()
-  g_best = candidates[['giantbomb_id', '_sim_score']].sort_values('_sim_score', ascending=False).groupby(candidates.giantbomb_id, as_index=False).first()
-
-  candidates=pd.merge(pd.merge(candidates, i_best, on='igdb_id', suffixes=('_candidates', '_i')), g_best, on='giantbomb_id')
-  print(f'Joining results in {len(candidates)} matches')
-  candidates=candidates[(candidates._sim_score_candidates == candidates._sim_score_i) & (candidates._sim_score_candidates == candidates._sim_score)]
-  print(f'After choosing top matches per id we have {len(candidates)} matches')
-
-  print(candidates.head(20))
-  candidates.to_sql('filtered_game_candidates', engine, schema='matching', if_exists='replace', index_label='key')
-
-  n_G_IDs = candidates.groupby('igdb_id', as_index=False).agg({'giantbomb_id': pd.Series.nunique})
-  n_I_IDs = candidates.groupby('giantbomb_id', as_index=False).agg({'igdb_id': pd.Series.nunique})
-
-  mult_G_IDs = n_G_IDs[n_G_IDs['giantbomb_id'] > 1]
-  mult_I_IDs = n_I_IDs[n_I_IDs['igdb_id'] > 1]
-
-  candidates_1_to_1 = candidates[
-    (~candidates.igdb_id.isin(mult_G_IDs.igdb_id)) & (~candidates.giantbomb_id.isin(mult_I_IDs.giantbomb_id))][
-    ['igdb_id', 'giantbomb_id']].groupby('igdb_id', as_index=False).agg({'giantbomb_id': min})
-
-  igdb_name_lookup = pd.read_sql_query('''select id, name from igdb.stage_games''', connection)
-  giantbomb_name_lookup = pd.read_sql_query('''select id, game_name from giantbomb.stage_games''', connection)
-
-  lookup_games=(candidates_1_to_1.merge(igdb_name_lookup, left_on='igdb_id', right_on='id', how='inner')
-                .merge(giantbomb_name_lookup, left_on='giantbomb_id', right_on='id', how='inner')
-                [['igdb_id', 'giantbomb_id', 'name', 'game_name']]
-                .rename(columns={"name":"igdb_title", "game_name":"giantbomb_title"}))
-
-  lookup_games.to_sql("games", engine, schema="lookup", if_exists="replace", index_label='id')
-
-  metacritic_games = select_metacritic_games.select_metacritic_games(connection) #TODO why does this not work like above without xxx.xxx?
+  ig_candidates = process_candidates(ig_candidates, 'igdb', 'giantbomb')
+  ig_candidates.to_sql('games_ig', engine, schema='matching', if_exists='replace', index_label='key')
 
 
-  i_g_lookup_games = select_i_g_lookup_games.select_i_g_lookup_games(connection)
+  im_candidates = ssj.jaccard_join(
+    igdb_games, metacritic_games, 
+    'key', 'key', 
+    'title', 'title', 
+    gt, tokenizer_threshold, 
+    l_out_attrs=['id', 'title', 'year', 'platforms'], r_out_attrs=['id', 'title', 'year', 'platforms'],
+    l_out_prefix='igdb_', r_out_prefix='metacritic_'
+  )
+  im_candidates = process_candidates(im_candidates, 'igdb', 'metacritic')
+  im_candidates.to_sql('games_im', engine, schema='matching', if_exists='replace', index_label='key')
+
+
+  gm_candidates = ssj.jaccard_join(
+    giantbomb_games, metacritic_games, 
+    'key', 'key', 
+    'title', 'title', 
+    gt, tokenizer_threshold, 
+    l_out_attrs=['id', 'title', 'year', 'platforms'], r_out_attrs=['id', 'title', 'year', 'platforms'],
+    l_out_prefix='giantbomb_', r_out_prefix='metacritic_'
+  )
+  gm_candidates = process_candidates(gm_candidates, 'giantbomb', 'metacritic')
+  gm_candidates.to_sql('games_gm', engine, schema='matching', if_exists='replace', index_label='key')
+
+  ###########################
+  ### CREATE LOOKUP TABLE ###
+  ###########################
+
+  matches = select_game_matches(connection)
+  unmatched_giantbomb = select_unmatched_giantbomb_games(connection)
+  unmatched_giantbomb['igdb_id'] = np.NaN
+  unmatched_giantbomb['metacritic_id'] = np.NaN
+  unmatched_metacritic = select_unmatched_metacritic_games(connection)
+  unmatched_metacritic['igdb_id'] = np.NaN
+  unmatched_metacritic['giantbomb_id'] = np.NaN
+  
+  matches = matches.append(unmatched_giantbomb, ignore_index=True).append(unmatched_metacritic, ignore_index=True)
+  matches['id'] = np.NaN # default value
+
+
+  generated_id = 1
+
+  # Addign ids for all common IGDB games
+  grouped = matches.groupby('igdb_id').filter(lambda x: len(x) > 1).groupby('igdb_id')
+  for name, group in grouped:
+    for index, row in group.iterrows():
+      matches.loc[index, 'id'] = generated_id
+    generated_id += 1
+
+  # Assign ids for all common GiantBomb games
+  grouped = matches[matches['id'].isnull()].groupby('giantbomb_id').filter(lambda x: len(x) > 1).groupby('giantbomb_id')
+  for name, group in grouped:
+    for index, row in group.iterrows():
+      matches.loc[index, 'id'] = generated_id
+    generated_id += 1
+
+  # Assign ids for all common Metacritic games
+  grouped = matches[matches['id'].isnull()].groupby('metacritic_id').filter(lambda x: len(x) > 1).groupby('metacritic_id')
+  for name, group in grouped:
+    for index, row in group.iterrows():
+      matches.loc[index, 'id'] = generated_id
+    generated_id += 1
+
+  # Assign unique ids for all remaining games
+  for index, row in matches[matches['id'].isnull()].iterrows():
+     matches.loc[index, 'id'] = generated_id
+     generated_id += 1
+
+  matches.to_sql('games', engine, schema='lookup', if_exists='replace', index=False, dtype={
+    'id': sqlalchemy.types.INT,
+    'igdb_id': sqlalchemy.types.INT,
+    'giantbomb_id': sqlalchemy.types.INT,
+    'metacritic_id': sqlalchemy.types.INT,
+  })
 
   connection.close()

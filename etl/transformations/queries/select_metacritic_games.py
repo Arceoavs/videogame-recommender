@@ -3,10 +3,10 @@ import pandas as pd
 def select_metacritic_games(connection):
   return pd.read_sql_query(
     ''' 
-    SELECT Array_agg(id)                   AS ids,
+    SELECT MIN(id) AS id,
            title,
-           Min(year)                       AS "year",
-           String_agg(DISTINCT NAME, ', ') AS platforms
+           Min(year) AS "year",
+           string_agg(DISTINCT NAME, ', ') AS platforms
     FROM   (SELECT m.id,
                    m.title,
                    m.year,
