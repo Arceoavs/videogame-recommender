@@ -1,11 +1,18 @@
 from flask_restful import Resource, reqparse
-from flask_jwt_extended import (create_access_token,
-                                create_refresh_token,
-                                jwt_required,
-                                jwt_refresh_token_required,
-                                get_jwt_identity,
-                                get_raw_jwt)
-from api.models import User, RevokedToken
+from flask_jwt_extended import (
+    create_access_token,
+    create_refresh_token,
+    jwt_required,
+    jwt_refresh_token_required,
+    get_jwt_identity,
+    get_raw_jwt
+    )
+from api.models import (
+    Game, 
+    Genre,
+    User,
+    RevokedToken
+    )
 
 PARSER = reqparse.RequestParser()
 PARSER.add_argument(
@@ -112,3 +119,11 @@ class SecretResource(Resource):
         return {
             'answer': 42
         }
+
+class AllGames(Resource):
+    def get(self):
+        return Game.return_all()
+
+class AllGenres(Resource):
+    def get(self):
+        return Genre.return_all()

@@ -69,11 +69,7 @@ with engine.connect() as connection:
 
   connection.execute(
     """
-    DROP TABLE IF EXISTS genres;
-    CREATE TABLE genres (
-      id int NOT NULL PRIMARY KEY,
-      name varchar(255)
-    );
+    DELETE FROM genres;
     INSERT INTO genres
     SELECT id, name
     FROM lookup.genres;
