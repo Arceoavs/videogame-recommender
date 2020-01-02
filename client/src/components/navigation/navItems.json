@@ -1,30 +1,30 @@
 [
   {
-    "tag": "rate",
+    "tag": "Rate",
     "to": "rate",
-    "icon": "mdi-start",
+    "icon": "mdi-star",
     "loggedIn": true
   },
   {
-    "tag": "recommend",
+    "tag": "Recommend",
     "to": "recommend",
-    "icon": "mdi-plus-box",
+    "icon": "mdi-settings",
     "loggedIn": true
   },
   {
-    "tag": "register",
+    "tag": "Register",
     "to": "register",
-    "icon": "mdi-register",
-    "loggedIn": true
+    "icon": "mdi-account-plus",
+    "loggedIn": false
   },
   {
-    "tag": "login",
+    "tag": "Login",
     "to": "login",
     "icon": "mdi-login",
     "loggedIn": false
   },
   {
-    "tag": "logout",
+    "tag": "Logout",
     "to": "logout",
     "icon": "mdi-logout",
     "loggedIn": true

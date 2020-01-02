@@ -1,8 +1,10 @@
 <template lang="pug">
-v-img(:aspect-ratio="4/3" src="../assets/vgr.png")
-  v-container(fluid)
+v-img(:aspect-ratio="4/3"
+  src="../assets/background.jpg"
+  gradient="0.25turn, rgba(0,0,0,1) 40%, rgba(0,0,0,0)")
+  v-container
     v-row
-      v-col(md="4" sm="6" cols="8")
+      v-col(sm="6" cols="10")
         v-row.mt-10(justify="start")
           v-col
             //- md and up
@@ -44,48 +46,20 @@ v-img(:aspect-ratio="4/3" src="../assets/vgr.png")
               | This is your life now.
               | Enjoy.
 
-        v-row.mt-10(justify="start")
-          v-col
-            h2.display-1 Login
-
-        v-row(justify="start")
-          v-col
-            v-text-field(color="primary_var"
-              prepend-inner-icon="mdi-email"
-              label="E-Mail"
-              hide-details)
-
-        v-row(justify="start")
-          v-col
-            v-text-field(color="primary_var"
-              prepend-inner-icon="mdi-lock"
-              label="Password"
-              v-model="password"
-              :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-              :rules="[rules.required, rules.min]"
-              :type="showPassword ? 'text' : 'password'"
-              counter
-              @click:append="show = !show")
-
-        v-row(justify="start")
-          v-col(align="end")
-            v-btn.mr-4 Register
-            v-btn Login
+        Register(v-if="showRegister")
+        Login(v-else)
 </template>
 
 <script>
+import Login from '@/components/authentication/Login'
+import Register from '@/components/authentication/Register'
 
 export default {
   name: 'Landing',
-  data () {
-    return {
-      password: '',
-      showPassword: false,
-      rules: {
-        required: value => !!value || 'Required.',
-        min: v => v.length >= 8 || 'Min 8 characters'
-      }
-    }
+  components: { Login, Register },
+  props: {
+    showLogin: { type: Boolean, default: false },
+    showRegister: { type: Boolean, default: false }
   }
 }
 </script>

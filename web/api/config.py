@@ -66,9 +66,9 @@ class DockerDevConfig(Config):
     credentials. 
     """
 
-    SQLALCHEMY_DATABASE_URI = (
-        "postgresql://videogamer:pwned-by-headshot-1337@postgres/videogames"
-    )  # hard coded URL, assuming you are using the docker-compose setup
+    SQLALCHEMY_DATABASE_URI = os.environ.get(
+        "DATABASE_URL"
+    )
     DEBUG = True
 
 
