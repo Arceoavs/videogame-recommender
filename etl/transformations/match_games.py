@@ -110,9 +110,9 @@ with engine.connect() as connection:
 
   gt = GameTokenizer()
 
-  ###########################
+  #############################
   ### CREATE MATCHING TABLE ###
-  ###########################
+  #############################
 
   ig_candidates = ssj.jaccard_join(
     igdb_games, giantbomb_games, 
