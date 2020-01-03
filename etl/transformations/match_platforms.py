@@ -155,11 +155,7 @@ with engine.connect() as connection:
 
   connection.execute(
     """
-    DROP TABLE IF EXISTS platforms;
-    CREATE TABLE platforms (
-      id int NOT NULL PRIMARY KEY,
-      name varchar(255)
-    );
+    DELETE FROM platforms;
     INSERT INTO platforms
     SELECT id, name
     FROM lookup.platforms;
