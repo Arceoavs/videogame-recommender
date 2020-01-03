@@ -69,6 +69,7 @@ with engine.connect() as connection:
 
   connection.execute(
     """
+    DELETE FROM game_genres;
     DELETE FROM genres;
     INSERT INTO genres
     SELECT id, name

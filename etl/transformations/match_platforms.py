@@ -155,6 +155,7 @@ with engine.connect() as connection:
 
   connection.execute(
     """
+    DELETE FROM game_platforms;
     DELETE FROM platforms;
     INSERT INTO platforms
     SELECT id, name

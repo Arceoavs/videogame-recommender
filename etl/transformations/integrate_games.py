@@ -41,7 +41,7 @@ def union_lists(s1, s2, s3):
 
 with engine.connect() as connection:
   # TODO: REMOVE THIS LIMIT CONSTRAIN
-  games = pd.read_sql_query('SELECT * FROM lookup.games LIMIT 5000Ad', connection)
+  games = pd.read_sql_query('SELECT * FROM lookup.games LIMIT 5000', connection)
 
   g_games = select_giantbomb_games_with_integrated_metadata(connection).add_prefix('giantbomb_')
   i_games = select_igdb_games_with_integrated_metadata(connection).add_prefix('igdb_')
