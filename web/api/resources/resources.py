@@ -24,7 +24,7 @@ AUTH_PARSER.add_argument(
 class Index(Resource):
     def get(self):
         return {
-            'greeting': 'Hello World'
+            'greeting': 'Hello Videogamer'
         }
 
 
@@ -137,6 +137,4 @@ class AllGenres(Resource):
 
 class AllPlatforms(Resource):
     def get(self):
-        args = GAME_PARSER.parse_args()
-        offset = 0 if args.offset is None else args.offset
-        return {'data': offset} #Platform.return_all()
+        return Platform.return_all()
