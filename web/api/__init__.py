@@ -42,6 +42,10 @@ def create_app(test_config=None):
     api.add_resource(resources.SecretResource, '/secret')
     api.add_resource(resources.Index, '/')
 
+    api.add_resource(resources.AllGames, '/games')
+    api.add_resource(resources.AllGenres, '/genres')
+    api.add_resource(resources.AllPlatforms, '/platforms')
+
     # check environment variables to see which config to load
     env = os.environ.get("FLASK_ENV", "dev")
     # for configuration options, look at api/config.py

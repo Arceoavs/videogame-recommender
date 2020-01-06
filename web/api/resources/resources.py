@@ -1,29 +1,36 @@
 from flask_restful import Resource, reqparse
-from flask_jwt_extended import (create_access_token,
-                                create_refresh_token,
-                                jwt_required,
-                                jwt_refresh_token_required,
-                                get_jwt_identity,
-                                get_raw_jwt)
-from api.models import User, RevokedToken
+from flask_jwt_extended import (
+    create_access_token,
+    create_refresh_token,
+    jwt_required,
+    jwt_refresh_token_required,
+    get_jwt_identity,
+    get_raw_jwt
+    )
+from api.models import (
+    Game, 
+    Genre,
+    Platform,
+    RevokedToken,
+    User,
+    )
 
-PARSER = reqparse.RequestParser()
-PARSER.add_argument(
+AUTH_PARSER = reqparse.RequestParser()
+AUTH_PARSER.add_argument(
     'username', help='This field cannot be blank', required=True)
-PARSER.add_argument(
+AUTH_PARSER.add_argument(
     'password', help='This field cannot be blank', required=True)
-
 
 class Index(Resource):
     def get(self):
         return {
-            'greeting': 'Hello World'
+            'greeting': 'Hello Videogamer'
         }
 
 
 class UserRegistration(Resource):
     def post(self):
-        data = PARSER.parse_args()
+        data = AUTH_PARSER.parse_args()
 
         if User.find_by_username(data['username']):
             return {'message': 'User {} already exists'.format(data['username'])}, 400
@@ -48,7 +55,7 @@ class UserRegistration(Resource):
 
 class UserLogin(Resource):
     def post(self):
-        data = PARSER.parse_args()
+        data = AUTH_PARSER.parse_args()
         current_user = User.find_by_username(data['username'])
 
         if not current_user:
@@ -112,3 +119,22 @@ class SecretResource(Resource):
         return {
             'answer': 42
         }
+
+GAME_PARSER = reqparse.RequestParser()
+GAME_PARSER.add_argument('offset', type=int)
+GAME_PARSER.add_argument('limit', type=int)
+
+class AllGames(Resource):
+    def get(self):
+        args = GAME_PARSER.parse_args()
+        offset = 0 if args.offset is None else args.offset
+        limit = 100 if args.limit is None else args.limit
+        return Game.return_all(offset, limit)
+
+class AllGenres(Resource):
+    def get(self):
+        return Genre.return_all()
+
+class AllPlatforms(Resource):
+    def get(self):
+        return Platform.return_all()

@@ -40,6 +40,14 @@ with engine.connect() as connection:
   i_platforms['name'] = i_platforms['name'].str.replace(" ", "")
 
   i_platforms.loc[i_platforms.name == 'NintendoGameCube', 'name'] = 'GameCube'
+  i_platforms.loc[i_platforms.name == 'CommodorePET', 'name'] = 'CommodorePET/CBM'
+  i_platforms.loc[i_platforms.name == 'PCDOS', 'name'] = 'PC' #multiple matches, drop_duplicates necessary!
+  g_platforms.loc[g_platforms.name == 'Commodore64', 'name'] = 'CommodoreC64/128'
+  g_platforms.loc[g_platforms.name == 'Commodore128', 'name'] = 'CommodoreC64/128'
+  g_platforms.loc[g_platforms.name == 'Genesis', 'name'] = 'SegaMegaDrive/Genesis'
+  g_platforms.loc[g_platforms.name == 'Jaguar', 'name'] = 'AtariJaguar'
+  g_platforms.loc[g_platforms.name == 'TurboGrafx-CD', 'name'] = 'Turbografx-16/PCEngineCD'
+  g_platforms.loc[g_platforms.name == 'TurboGrafx-16', 'name'] = 'TurboGrafx-16/PCEngine'
 
   matching_pairs = ssj.edit_distance_join(
     g_platforms, i_platforms, 
@@ -49,7 +57,7 @@ with engine.connect() as connection:
     l_out_attrs=['ws_name'], r_out_attrs=['ws_name'],
     l_out_prefix='giantbomb_', r_out_prefix='igdb_'
   )
-  
+
   matching_pairs.to_sql('platforms', engine, schema='matching', if_exists='replace', index=False)
 
 
@@ -60,7 +68,16 @@ with engine.connect() as connection:
   )
   giantbomb_merged['giantbomb_id'] = giantbomb_merged['id']
   giantbomb_merged['giantbomb_name'] = giantbomb_merged['name']
-    
+
+  giantbomb_merged.loc[giantbomb_merged.ws_name == 'Commodore 64', 'ws_name'] = 'Commodore C64/128'
+  giantbomb_merged.loc[giantbomb_merged.ws_name == 'Commodore 128', 'ws_name'] = 'Commodore C64/128'
+  giantbomb_merged.loc[giantbomb_merged.ws_name == 'Genesis', 'ws_name'] = 'Sega Mega Drive/Genesis'
+  giantbomb_merged.loc[giantbomb_merged.ws_name == 'Jaguar', 'ws_name'] = 'Atari Jaguar'
+  giantbomb_merged.loc[giantbomb_merged.ws_name == 'TurboGrafx-CD', 'ws_name'] = 'Turbografx-16/PC Engine CD'
+  giantbomb_merged.loc[giantbomb_merged.ws_name == 'TurboGrafx-16', 'ws_name'] = 'Turbografx-16/PC Engine'
+  #TODO: better manual matching?
+
+
   igdb_merged = matching_pairs.merge(
      i_platforms, left_on='igdb_id', right_on='id', how='outer'
    )
@@ -70,6 +87,7 @@ with engine.connect() as connection:
 
   merged = pd.concat([giantbomb_merged, igdb_merged], sort=False, ignore_index=True)
   merged = merged[['ws_name', 'igdb_id', 'giantbomb_id']]
+
   merged.to_sql('platforms', engine, schema='lookup', if_exists='replace', index_label='id')
   
   # Integrate Metacritic dataset
@@ -106,6 +124,7 @@ with engine.connect() as connection:
 
   merged_matching = merged_matching[['_id_x', 'giantbomb_id', 'igdb_id_x', 'giantbomb_ws_name', 'igdb_ws_name', 'metacritic_name']]
   merged_matching = merged_matching.rename({'_id_x': 'id', 'igdb_id_x': 'igdb_id'}, axis=1)
+  merged_matching = merged_matching.drop_duplicates()
   merged_matching.to_sql('platforms', engine, schema='matching', if_exists='replace', index=False)
 
   # Lookup Table
@@ -115,7 +134,7 @@ with engine.connect() as connection:
   )
   merged_lookup = merged_lookup[['id_x', 'ws_name', 'igdb_id_x', 'giantbomb_id', 'metacritic_name']]
   merged_lookup = merged_lookup.rename({'id_x': 'id', 'ws_name' : 'name', 'igdb_id_x': 'igdb_id'}, axis=1)
-
+  merged_lookup = merged_lookup.drop_duplicates()
   merged_lookup.loc[merged_lookup.metacritic_name == 'NintendoDS', 'metacritic_name'] = 'DS'
   merged_lookup.loc[merged_lookup.metacritic_name == 'Nintendo3DS', 'metacritic_name'] = '3DS'
   merged_lookup.loc[merged_lookup.metacritic_name == 'PlayStationPortable', 'metacritic_name'] = 'PSP'
@@ -136,11 +155,8 @@ with engine.connect() as connection:
 
   connection.execute(
     """
-    DROP TABLE IF EXISTS platforms;
-    CREATE TABLE platforms (
-      id int NOT NULL PRIMARY KEY,
-      name varchar(255)
-    );
+    DELETE FROM game_platforms;
+    DELETE FROM platforms;
     INSERT INTO platforms
     SELECT id, name
     FROM lookup.platforms;
