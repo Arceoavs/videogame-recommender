@@ -1,6 +1,4 @@
-import pandas as pd
-import sqlalchemy
-from utilities import engine
+from flask import request
 from flask_restful import Resource, reqparse
 from flask_jwt_extended import (
     create_access_token,
@@ -14,9 +12,14 @@ from api.models import (
     Game, 
     Genre,
     Platform,
+    Rating,
     RevokedToken,
     User,
     )
+import implicit
+from scipy.sparse import csr_matrix
+import numpy as np
+
 
 AUTH_PARSER = reqparse.RequestParser()
 AUTH_PARSER.add_argument(
@@ -134,70 +137,49 @@ class AllGames(Resource):
         limit = 100 if args.limit is None else args.limit
         return Game.return_all(offset, limit)
 
+
 class AllGenres(Resource):
     def get(self):
         return Genre.return_all()
+
 
 class AllPlatforms(Resource):
     def get(self):
         return Platform.return_all()
 
-RATING_PARSER = reqparse.RequestParser()
-RATING_PARSER.add_argument('user_id', required=True)
-RATING_PARSER.add_argument('game_id', required=True)
-RATING_PARSER.add_argument('rating', required=True)
 
-class SubmitRating(Resource):
-    def post(self):
-        connection=engine.connect()
-        args = RATING_PARSER.parse_args()
-        #TODO: identify user from token
-        user_id = 1 #TODO: Placeholder, remove!
-        game_id = args.game_id
-        rating = args.rating*2
+class GameRating(Resource):
 
-        # dirty variant, probably not even transaction save, use auto-incrementing id in postgres instead
-        max_id = pd.read_sql_query(
-            '''
-            SELECT MAX(id) FROM PUBLIC.ratings
-            ''',
-            connection
-        )
-        id = max_id + 1
-        user_rating=pd.DataFrame([[id, user_id, game_id, rating]], columns=['id', 'user_id', 'game_id', 'rating'])
-        user_rating.to_sql('ratings', connection, if_exists='append', dtype={
-            'user_id': sqlalchemy.types.INT,
-            'game_id': sqlalchemy.types.INT,
-            'rating': sqlalchemy.types.INT,
-        })
-
-class GetRecommendation(Resource):
     def get(self):
-        connection=engine.connect()
-        #get user from secret route header token
-        user_id = 1 #TODO: Placeholder, remove!
+        print("234")
+        obj_ratings = Rating.query.all()
+        game_ids = np.array(map(lambda r: r.game_id, obj_ratings))
+        user_ids = np.array(map(lambda r: r.user_id, obj_ratings))
+        values = np.asarray(map(lambda r: r.value, obj_ratings))
+        print("123")
+        print(values)
+        csr_matrix(values, (game_ids, user_ids), dtype=np.int8)
+        return {'hallo': ''}
 
-        #option 1: create user profile (works also for users not in trained model)
-        user_ratings_sql = """
-                SELECT
-                        user_id,
-                        game_id,
-                        ROUND(AVG(rating)) rating
-                FROM
-                        public.ratings
-                WHERE
-                        user_id=""" + str(user_id) + """
-                GROUP BY
-                        user_id,
-                        game_id
-            """
-
-        user_ratings = pd.read_sql_query(user_ratings_sql, connection)
-
-        #create user profile from user table
-        #recommend based on model (initialize and update it somewhere)
-        #if user exsits in model, select this user, otherwise create new user profile
-        return 0
+    @jwt_required
+    def post(self):
+        try:
+            user_email = get_jwt_identity()
+            user_id = User.find_by_username(user_email).id
+            game_id = request.json['gameId']
+            value = request.json['value']
+            rating = Rating(
+                game_id=game_id,
+                user_id=user_id,
+                value=value
+            )
+            rating.save_to_db()
+            # TODO:
+            # Implicit_instance.add(rating)
+            # Imlicit_instance.recalculate()
+        except:
+            return {'message': 'Something went wrong'}, 500
+        return {'message': 'Your rating was successfully saved'}, 201
 
 
 

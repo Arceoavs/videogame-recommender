@@ -43,6 +43,7 @@ def create_app(test_config=None):
     api.add_resource(resources.Index, '/')
 
     api.add_resource(resources.AllGames, '/games')
+    api.add_resource(resources.GameRating, '/rating')
     api.add_resource(resources.AllGenres, '/genres')
     api.add_resource(resources.AllPlatforms, '/platforms')
 
