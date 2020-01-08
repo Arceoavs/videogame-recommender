@@ -1,3 +1,6 @@
+import pandas as pd
+import sqlalchemy
+from utilities import engine
 from flask_restful import Resource, reqparse
 from flask_jwt_extended import (
     create_access_token,
@@ -138,3 +141,64 @@ class AllGenres(Resource):
 class AllPlatforms(Resource):
     def get(self):
         return Platform.return_all()
+
+RATING_PARSER = reqparse.RequestParser()
+RATING_PARSER.add_argument('user_id', required=True)
+RATING_PARSER.add_argument('game_id', required=True)
+RATING_PARSER.add_argument('rating', required=True)
+
+class SubmitRating(Resource):
+    def post(self):
+        connection=engine.connect()
+        args = RATING_PARSER.parse_args()
+        #TODO: identify user from token
+        user_id = 1 #TODO: Placeholder, remove!
+        game_id = args.game_id
+        rating = args.rating*2
+
+        # dirty variant, probably not even transaction save, use auto-incrementing id in postgres instead
+        max_id = pd.read_sql_query(
+            '''
+            SELECT MAX(id) FROM PUBLIC.ratings
+            ''',
+            connection
+        )
+        id = max_id + 1
+        user_rating=pd.DataFrame([[id, user_id, game_id, rating]], columns=['id', 'user_id', 'game_id', 'rating'])
+        user_rating.to_sql('ratings', connection, if_exists='append', dtype={
+            'user_id': sqlalchemy.types.INT,
+            'game_id': sqlalchemy.types.INT,
+            'rating': sqlalchemy.types.INT,
+        })
+
+class GetRecommendation(Resource):
+    def get(self):
+        connection=engine.connect()
+        #get user from secret route header token
+        user_id = 1 #TODO: Placeholder, remove!
+
+        #option 1: create user profile (works also for users not in trained model)
+        user_ratings_sql = """
+                SELECT
+                        user_id,
+                        game_id,
+                        ROUND(AVG(rating)) rating
+                FROM
+                        public.ratings
+                WHERE
+                        user_id=""" + str(user_id) + """
+                GROUP BY
+                        user_id,
+                        game_id
+            """
+
+        user_ratings = pd.read_sql_query(user_ratings_sql, connection)
+
+        #create user profile from user table
+        #recommend based on model (initialize and update it somewhere)
+        #if user exsits in model, select this user, otherwise create new user profile
+        return 0
+
+
+
+
