@@ -1,4 +1,4 @@
-from flask import request
+from flask import request, jsonify
 from flask_restful import Resource, reqparse
 from flask_jwt_extended import (
     create_access_token,
@@ -148,18 +148,32 @@ class AllPlatforms(Resource):
         return Platform.return_all()
 
 
+
+
 class GameRating(Resource):
 
-    def get(self):
-        print("234")
+    def initModel():
+        print("Initializing Implicit model. This might take a while (approx. 1 minute)...")
         obj_ratings = Rating.query.all()
-        game_ids = np.array(map(lambda r: r.game_id, obj_ratings))
-        user_ids = np.array(map(lambda r: r.user_id, obj_ratings))
-        values = np.asarray(map(lambda r: r.value, obj_ratings))
-        print("123")
-        print(values)
-        csr_matrix(values, (game_ids, user_ids), dtype=np.int8)
-        return {'hallo': ''}
+        game_ids = np.array(list(map(lambda r: r.game_id, obj_ratings)))
+        user_ids = np.array(list(map(lambda r: r.user_id, obj_ratings)))
+        values = np.asarray(list(map(lambda r: r.value, obj_ratings)))
+        game_user_matrix = csr_matrix((values, (game_ids, user_ids)))
+        global user_game_matrix
+        user_game_matrix = game_user_matrix.T.tocsr()
+        global model
+        model = implicit.als.AlternatingLeastSquares(factors=50)
+        model.fit(game_user_matrix)
+
+
+    @jwt_required
+    def get(self):
+        user_email = get_jwt_identity()
+        user_id = User.find_by_username(user_email).id
+
+        recommendations = model.recommend(user_id, user_game_matrix, 100)
+        print(type(recommendations))
+        return jsonify({'recommendations': recommendations})
 
     @jwt_required
     def post(self):

@@ -47,6 +47,7 @@ def create_app(test_config=None):
     api.add_resource(resources.AllGenres, '/genres')
     api.add_resource(resources.AllPlatforms, '/platforms')
 
+
     # check environment variables to see which config to load
     env = os.environ.get("FLASK_ENV", "dev")
     # for configuration options, look at api/config.py
@@ -73,5 +74,10 @@ def create_app(test_config=None):
 
     # register error Handler
     app.register_error_handler(Exception, all_exception_handler)
+
+
+    # better variant to initialize model?
+    with app.app_context():
+        resources.GameRating.initModel()
 
     return app
