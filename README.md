@@ -67,6 +67,8 @@ sudo docker-compose -f docker-compose.prod.yml up --build -d
 ```
 The new backend will be re-deployed and available on http://videogames.uni-muenster.de on the standard http port 80.
 
+Yout might want to execute sudo docker-compose `sudo docker-compose exec web python manage.py db init` and `sudo docker-compose exec web python manage.py db migrate` when running into database errors. 
+
 ## Datasets
 
 ### Metacritic
