@@ -173,7 +173,10 @@ class GameRating(Resource):
 
         recommendations = model.recommend(user_id, user_game_matrix, 100)
         print(type(recommendations))
-        return jsonify({'recommendations': recommendations})
+        #return jsonify({'recommendations': recommendations}) #convert numpy int64 to normal python data type first
+        return {'message': 'return is to be implemented'}
+
+
 
     @jwt_required
     def post(self):
