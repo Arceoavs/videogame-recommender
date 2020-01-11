@@ -1,13 +1,14 @@
 import Vue from 'vue'
 
-function concanateSting (offset, limit) {
-  let base = '/games'
+function concanateSting ({ offset, limit }) {
+  let url = '/games'
   if (offset || limit) {
-    base += '?'
-    if (offset) base += 'offset=' + offset + '&'
-    if (limit) base += 'limit=' + limit
+    url += '?'
+    if (offset) url += 'offset=' + offset + '&'
+    if (limit) url += 'limit=' + limit
   }
-  return base
+  console.log(url)
+  return url
 }
 export default {
   state: {
@@ -22,9 +23,9 @@ export default {
     }
   },
   actions: {
-    async retrieveGames ({ commit }, offset, limit) {
+    async retrieveGames ({ commit }, { offset, limit }) {
       try {
-        const res = await Vue.prototype.$http.get(concanateSting(offset, limit))
+        const res = await Vue.prototype.$http.get(concanateSting({ offset, limit }))
         commit('setGames', res.data.data)
       } catch (err) {
         commit('authError', err.message)
