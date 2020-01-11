@@ -155,10 +155,10 @@ class GameRating(Resource):
     def initModel():
         print("Initializing Implicit model. This might take a while (approx. 1 minute)...")
         obj_ratings = Rating.query.all()
-        game_ids = np.array(list(map(lambda r: r.game_id, obj_ratings)))
-        user_ids = np.array(list(map(lambda r: r.user_id, obj_ratings)))
+        game_ids_minus1 = np.array(list(map(lambda r: r.game_id-1, obj_ratings)))
+        user_ids_minus1 = np.array(list(map(lambda r: r.user_id-1, obj_ratings)))
         values = np.asarray(list(map(lambda r: r.value, obj_ratings)))
-        game_user_matrix = csr_matrix((values, (game_ids, user_ids)))
+        game_user_matrix = csr_matrix((values, (game_ids_minus1, user_ids_minus1)), shape = (Game.query.count(), user_ids_minus1.size))
         global user_game_matrix
         user_game_matrix = game_user_matrix.T.tocsr()
         global model
@@ -171,8 +171,19 @@ class GameRating(Resource):
         user_email = get_jwt_identity()
         user_id = User.find_by_username(user_email).id
 
-        rec = model.recommend(user_id, user_game_matrix, 100)
-        rec_conv=[[int(rec[0]), float(rec[1])] for rec in rec]
+        # create new user profile to also include ratings and predict for users not in model
+        ratings = Rating.query.filter(Rating.user_id==user_id)
+
+        game_ids_minus1 = np.array(list(map(lambda r: r.game_id-1, ratings)))
+        user_ids_minus1 = np.array([0]*game_ids_minus1.size)
+        values = np.asarray(list(map(lambda r: r.value, ratings)))
+
+        user_profile = csr_matrix((values, (user_ids_minus1, game_ids_minus1)), shape = (1, user_game_matrix.shape[1]))
+
+        rec = model.recommend(0, user_profile, 100, recalculate_user = True)
+        rec_conv=[[int(rec[0])+1, float(rec[1])] for rec in rec]
+
+
         return jsonify({'recommendations': rec_conv})
 
 
