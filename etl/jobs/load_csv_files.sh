@@ -10,8 +10,6 @@ python ./transformations/load_igdb_games.py
 python ./transformations/load_igdb_genres.py
 python ./transformations/load_igdb_platforms.py
 python ./transformations/load_igdb_ratings.py
-python ./transformations/load_igdb_reviews.py
-python ./transformations/load_igdb_themes.py
 
 python ./transformations/load_metacritic_games.py
 python ./transformations/load_metacritic_user_comments.py
