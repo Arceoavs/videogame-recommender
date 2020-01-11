@@ -7,15 +7,15 @@ from flask_jwt_extended import (
     jwt_refresh_token_required,
     get_jwt_identity,
     get_raw_jwt
-    )
+)
 from api.models import (
-    Game, 
+    Game,
     Genre,
     Platform,
     Rating,
     RevokedToken,
     User,
-    )
+)
 import implicit
 from scipy.sparse import csr_matrix
 import numpy as np
@@ -26,6 +26,7 @@ AUTH_PARSER.add_argument(
     'username', help='This field cannot be blank', required=True)
 AUTH_PARSER.add_argument(
     'password', help='This field cannot be blank', required=True)
+
 
 class Index(Resource):
     def get(self):
@@ -47,7 +48,7 @@ class UserRegistration(Resource):
         )
 
         try:
-            new_user.save_to_db()
+            new_user.save()
             access_token = create_access_token(identity=data['username'])
             refresh_token = create_refresh_token(identity=data['username'])
             return {
@@ -85,7 +86,7 @@ class UserLogoutAccess(Resource):
         jti = get_raw_jwt()['jti']
         try:
             revoked_token = RevokedToken(jti=jti)
-            revoked_token.add()
+            revoked_token.save()
             return {'message': 'Access token has been revoked'}, 200
         except:
             return {'message': 'Something went wrong'}, 500
@@ -97,7 +98,7 @@ class UserLogoutRefresh(Resource):
         jti = get_raw_jwt()['jti']
         try:
             revoked_token = RevokedToken(jti=jti)
-            revoked_token.add()
+            revoked_token.save()
             return {'message': 'Refresh token has been revoked'}
         except:
             return {'message': 'Something went wrong'}, 500
@@ -119,16 +120,17 @@ class AllUsers(Resource):
         return User.delete_all()
 
 
-class SecretResource(Resource):
+class CurrentUser(Resource):
     @jwt_required
     def get(self):
-        return {
-            'answer': 42
-        }
+        current_user = get_jwt_identity()
+        return User.return_by_username(current_user)
+
 
 GAME_PARSER = reqparse.RequestParser()
 GAME_PARSER.add_argument('offset', type=int)
 GAME_PARSER.add_argument('limit', type=int)
+
 
 class AllGames(Resource):
     def get(self):
@@ -136,6 +138,11 @@ class AllGames(Resource):
         offset = 0 if args.offset is None else args.offset
         limit = 100 if args.limit is None else args.limit
         return Game.return_all(offset, limit)
+
+
+class GameDetail(Resource):
+    def get(self, id):
+        return Game.return_by_id(id)
 
 
 class AllGenres(Resource):
@@ -146,8 +153,6 @@ class AllGenres(Resource):
 class AllPlatforms(Resource):
     def get(self):
         return Platform.return_all()
-
-
 
 
 class GameRating(Resource):
@@ -165,7 +170,6 @@ class GameRating(Resource):
         model = implicit.als.AlternatingLeastSquares(factors=50)
         model.fit(game_user_matrix)
 
-
     @jwt_required
     def get(self):
         user_email = get_jwt_identity()
@@ -173,31 +177,25 @@ class GameRating(Resource):
 
         recommendations = model.recommend(user_id, user_game_matrix, 100)
         print(type(recommendations))
-        #return jsonify({'recommendations': recommendations}) #convert numpy int64 to normal python data type first
+        # return jsonify({'recommendations': recommendations}) #convert numpy int64 to normal python data type first
         return {'message': 'return is to be implemented'}
-
-
 
     @jwt_required
     def post(self):
         try:
             user_email = get_jwt_identity()
             user_id = User.find_by_username(user_email).id
-            game_id = request.json['gameId']
+            game_id = request.json['game_id']
             value = request.json['value']
             rating = Rating(
                 game_id=game_id,
                 user_id=user_id,
                 value=value
             )
-            rating.save_to_db()
+            rating.save()
             # TODO:
             # Implicit_instance.add(rating)
             # Imlicit_instance.recalculate()
         except:
             return {'message': 'Something went wrong'}, 500
         return {'message': 'Your rating was successfully saved'}, 201
-
-
-
-
