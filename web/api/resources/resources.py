@@ -166,22 +166,21 @@ class GameRating(Resource):
 
     @jwt_required
     def post(self):
-        try:
-            user_email = get_jwt_identity()
-            user_id = User.find_by_username(user_email).id
-            game_id = request.json['game_id']
-            value = request.json['value']
-            rating = Rating(
-                game_id=game_id,
-                user_id=user_id,
-                value=value
-            )
-            rating.save()
-            # TODO:
-            # Implicit_instance.add(rating)
-            # Imlicit_instance.recalculate()
-        except:
-            return {'message': 'Something went wrong'}, 500
+        user_email = get_jwt_identity()
+        user_id = User.find_by_username(user_email).id
+        game_id = request.json['game_id']
+        value = request.json['value']
+        if value < 0 or value > 5:
+            raise Exception('Rating value should be between 0 and 5')
+        rating = Rating(
+            game_id=game_id,
+            user_id=user_id,
+            value=value * 2
+        )
+        rating.save()
+        # TODO:
+        # Implicit_instance.add(rating)
+        # Imlicit_instance.recalculate()
         return {'message': 'Your rating was successfully saved'}, 201
 
 
