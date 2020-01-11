@@ -1,6 +1,9 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
+// Modules
+import games from './modules/games'
+
 Vue.use(Vuex)
 
 export default new Vuex.Store({
@@ -70,6 +73,5 @@ export default new Vuex.Store({
     loggedIn: state => !!state.token,
     authStatus: state => state.status
   },
-  modules: {
-  }
+  modules: { games }
 })

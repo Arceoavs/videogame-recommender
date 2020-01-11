@@ -45,8 +45,8 @@ const routes = [
     name: 'rate',
     meta: {
       requiresAuth: true
-    }
-    // component: () => import(/* webpackChunkName: "about" */ '../views/Recommend.vue')
+    },
+    component: () => import(/* webpackChunkName: "rate" */ '../views/Rate.vue')
   },
   {
     path: '/logout',
