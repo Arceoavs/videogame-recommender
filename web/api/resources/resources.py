@@ -32,7 +32,7 @@ AUTH_PARSER.add_argument(
 class Index(Resource):
     def get(self):
         return {
-            'greeting': 'Hello Videogamer'
+            'greeting': 'Hello videogamer'
         }
 
 
@@ -164,42 +164,6 @@ class AllPlatforms(Resource):
 
 class GameRating(Resource):
 
-    def initModel():
-        print("Initializing Implicit model. This might take a while (approx. 1 minute)...")
-        obj_ratings = Rating.query.all()
-        game_ids_minus1 = np.array(
-            list(map(lambda r: r.game_id-1, obj_ratings)))
-        user_ids_minus1 = np.array(
-            list(map(lambda r: r.user_id-1, obj_ratings)))
-        values = np.asarray(list(map(lambda r: r.value, obj_ratings)))
-        game_user_matrix = csr_matrix((values, (game_ids_minus1, user_ids_minus1)), shape=(
-            Game.query.count(), user_ids_minus1.size))
-        global user_game_matrix
-        user_game_matrix = game_user_matrix.T.tocsr()
-        global model
-        model = implicit.als.AlternatingLeastSquares(factors=50)
-        model.fit(game_user_matrix)
-
-    @jwt_required
-    def get(self):
-        user_email = get_jwt_identity()
-        user_id = User.find_by_username(user_email).id
-
-        # create new user profile to also include ratings and predict for users not in model
-        ratings = Rating.query.filter(Rating.user_id == user_id)
-
-        game_ids_minus1 = np.array(list(map(lambda r: r.game_id-1, ratings)))
-        user_ids_minus1 = np.array([0]*game_ids_minus1.size)
-        values = np.asarray(list(map(lambda r: r.value, ratings)))
-
-        user_profile = csr_matrix((values, (user_ids_minus1, game_ids_minus1)), shape=(
-            1, user_game_matrix.shape[1]))
-
-        rec = model.recommend(0, user_profile, 100, recalculate_user=True)
-        rec_conv = [[int(rec[0])+1, float(rec[1])] for rec in rec]
-
-        return jsonify({'recommendations': rec_conv})
-
     @jwt_required
     def post(self):
         try:
@@ -219,3 +183,44 @@ class GameRating(Resource):
         except:
             return {'message': 'Something went wrong'}, 500
         return {'message': 'Your rating was successfully saved'}, 201
+
+
+class GameRecommendations(Resource):
+
+    def initilizeImplicit():
+        print('[Implicit] Initializing Implicit model. This might take a while...')
+        obj_ratings = Rating.query.all()
+        game_ids_minus1 = np.array(
+            list(map(lambda r: r.game_id-1, obj_ratings)))
+        user_ids_minus1 = np.array(
+            list(map(lambda r: r.user_id-1, obj_ratings)))
+        values = np.asarray(list(map(lambda r: r.value, obj_ratings)))
+        game_user_matrix = csr_matrix((values, (game_ids_minus1, user_ids_minus1)), shape=(
+            Game.query.count(), user_ids_minus1.size))
+        global user_game_matrix
+        user_game_matrix = game_user_matrix.T.tocsr()
+        global model
+        model = implicit.als.AlternatingLeastSquares(factors=50)
+        model.fit(game_user_matrix)
+        print('[Implicit] Initializing completed')
+
+    @jwt_required
+    def get(self):
+        user_email = get_jwt_identity()
+        user_id = User.find_by_username(user_email).id
+
+        # create new user profile to also include ratings and predict for users not in model
+        ratings = Rating.query.filter(Rating.user_id == user_id)
+
+        game_ids_minus1 = np.array(list(map(lambda r: r.game_id-1, ratings)))
+        user_ids_minus1 = np.array([0]*game_ids_minus1.size)
+        values = np.asarray(list(map(lambda r: r.value, ratings)))
+
+        user_profile = csr_matrix((values, (user_ids_minus1, game_ids_minus1)), shape=(
+            1, user_game_matrix.shape[1]))
+
+        rec = model.recommend(0, user_profile, 100, recalculate_user=True)
+        rec_conv = [[int(rec[0])+1, float(rec[1])] for rec in rec]
+
+        game_ids = list(map(lambda r: r[0], rec_conv))
+        return Game.return_recommendations(game_ids)

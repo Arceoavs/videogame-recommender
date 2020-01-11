@@ -66,6 +66,10 @@ class Game(db.Model):
         }
 
     @classmethod
+    def return_recommendations(self, game_ids):
+        return {'recommendations': list(map(lambda g: g.to_json, self.query.filter(self.id.in_(game_ids)).all()))}
+
+    @classmethod
     def return_by_id(self, id):
         game = self.query.filter_by(id=id).first()
         if game is None:
