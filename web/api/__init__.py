@@ -76,7 +76,7 @@ def create_app(test_config=None):
     app.register_error_handler(Exception, all_exception_handler)
 
 
-    # better variant to initialize model?
+    # better variant to initialize model? might be calculated twice because "restarting with stat"
     with app.app_context():
         resources.GameRating.initModel()
 

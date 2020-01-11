@@ -171,10 +171,9 @@ class GameRating(Resource):
         user_email = get_jwt_identity()
         user_id = User.find_by_username(user_email).id
 
-        recommendations = model.recommend(user_id, user_game_matrix, 100)
-        print(type(recommendations))
-        #return jsonify({'recommendations': recommendations}) #convert numpy int64 to normal python data type first
-        return {'message': 'return is to be implemented'}
+        rec = model.recommend(user_id, user_game_matrix, 100)
+        rec_conv=[[int(rec[0]), float(rec[1])] for rec in rec]
+        return jsonify({'recommendations': rec_conv})
 
 
 
