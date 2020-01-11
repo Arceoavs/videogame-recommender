@@ -1,3 +1,4 @@
+import datetime
 from flask import request, jsonify
 from flask_restful import Resource, reqparse
 from flask_jwt_extended import (
@@ -49,7 +50,9 @@ class UserRegistration(Resource):
 
         try:
             new_user.save()
-            access_token = create_access_token(identity=data['username'])
+            expires = datetime.timedelta(days=31)
+            access_token = create_access_token(
+                identity=data['username'], expires_delta=expires)
             refresh_token = create_refresh_token(identity=data['username'])
             return {
                 'message': 'User {} was created'.format(data['username']),
@@ -69,7 +72,9 @@ class UserLogin(Resource):
             return {'message': 'User {} doesn\'t exist'.format(data['username'])}, 404
 
         if User.verify_hash(data['password'], current_user.password):
-            access_token = create_access_token(identity=data['username'])
+            expires = datetime.timedelta(days=31)
+            access_token = create_access_token(
+                identity=data['username'], expires_delta=expires)
             refresh_token = create_refresh_token(identity=data['username'])
             return {
                 'message': 'Logged in as {}'.format(current_user.username),
@@ -108,7 +113,9 @@ class TokenRefresh(Resource):
     @jwt_refresh_token_required
     def post(self):
         current_user = get_jwt_identity()
-        access_token = create_access_token(identity=current_user)
+        expires = datetime.timedelta(days=31)
+        access_token = create_access_token(
+            identity=current_user, expires_delta=expires)
         return {'access_token': access_token}
 
 
