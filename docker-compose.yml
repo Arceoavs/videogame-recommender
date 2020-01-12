@@ -31,7 +31,7 @@ services:
   web:
     build:
       context: ./web
-      dockerfile: Dockerfile-dev
+      dockerfile: dev.Dockerfile
     depends_on:
       - postgres
     entrypoint:
