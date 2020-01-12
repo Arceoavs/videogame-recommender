@@ -9,12 +9,12 @@ from .RevokedToken import RevokedToken
 from .User import User
 
 __all__ = [
-  'db', 
-  'Game',
-  'Genre', 
-  'Platform',
-  'RevokedToken'
-  'User',
+    'db',
+    'Game',
+    'Genre',
+    'Platform',
+    'RevokedToken',
+    'User',
 ]
 
 # You must import all of the new Models you create to this page
