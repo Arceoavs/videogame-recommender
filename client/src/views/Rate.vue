@@ -11,7 +11,7 @@ v-container(fluid)
         | mdi-chevron-left
 
     v-col(cols="10")
-      swiper.primary-border(:options="swiperOptions"
+      swiper(:options="swiperOptions"
         ref="swiper"
         @reachEnd="$store.dispatch('loadNext')"
         @reachBeginning="$store.dispatch('loadPrev')")
@@ -69,7 +69,7 @@ export default {
 
   },
   mounted () {
-    this.$store.dispatch('retrieveGames', { offset: 100, limit: 10 })
+    this.$store.dispatch('retrieveGames', { limit: 10 })
   }
 }
 </script>
