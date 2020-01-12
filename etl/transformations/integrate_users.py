@@ -1,40 +1,27 @@
 import pandas as pd
 import sqlalchemy
 from utilities import engine
-from queries import (
-  select_igdb_users,
-select_giantbomb_users,
-select_metacritic_users
-)
+
+# unhashed: leet1337
+DEFAULT_PASSWORD = '$pbkdf2-sha256$29000$632vFeL8P0fIGUMIAYAQIg$X.IgODMuJGDYE.xpcWLjjnDJmU5BwQ3uyld5Ixgll6Y'
+
 with engine.connect() as connection:
-    i_users = select_igdb_users.select_igdb_users(connection).add_prefix('igdb_')
-    g_users = select_giantbomb_users.select_giantbomb_users(connection).add_prefix('giantbomb_')
-    m_users = select_metacritic_users.select_metacritic_users(connection).add_prefix('metacritic_')
-    #print(i_users)
-    #print(g_users)
-    #print(m_users)
-    combined_users=pd.concat([i_users, g_users, m_users], sort=False)
-    #print(combined_users)
 
-    combined_users.to_sql('users', engine, schema='lookup', if_exists='replace', index_label='id', dtype={
-    'id': sqlalchemy.types.INT,
-    'giantbomb_name': sqlalchemy.types.VARCHAR,
-    'igdb_id': sqlalchemy.types.INT,
-    'metacritic_name': sqlalchemy.types.VARCHAR,
-    })
+    connection.execute('DELETE FROM users CASCADE')
 
-    # more elegant to edit current combined_users df, but more complicated
-    i_users['igdb_id'] =  i_users['igdb_id'].astype(str) + '@igdb.user'
-    g_users['giantbomb_name'] = g_users['giantbomb_name'].astype(str) + '@giantbomb.user'
-    m_users['metacritic_name'] = m_users['metacritic_name'].astype(str) + '@metacritic.user'
+    i_users = pd.read_sql_query('SELECT DISTINCT "user" AS username FROM igdb.stage_ratings', connection)
+    i_users['username'] =  i_users['username'].astype(str) + '@igdb.user'
+    i_users['password'] =  DEFAULT_PASSWORD
+    i_users.to_sql('users', engine, if_exists='append', index=False)
 
-    combined_users = pd.concat([i_users, g_users, m_users], sort=False)
-    #print(combined_users)
+    g_users = pd.read_sql_query('SELECT DISTINCT username FROM giantbomb.stage_user_reviews', connection)
+    g_users['username'] =  g_users['username'].astype(str) + '@giantbomb.user'
+    g_users['password'] =  DEFAULT_PASSWORD
+    g_users.to_sql('users', engine, if_exists='append', index=False)
 
-    users = combined_users['igdb_id'].combine_first(combined_users['giantbomb_name']).combine_first(combined_users['metacritic_name']).to_frame().rename(columns={"igdb_id":"username"})
-    users['password'] = 'VGRstandarduser'
-    # hashed password for real users? Then this password should be stored in hashed form, too.
-    #print(users)
+    m_users = pd.read_sql_query('SELECT DISTINCT username FROM metacritic.stage_user_comments', connection)
+    m_users['username'] =  m_users['username'].astype(str) + '@metacritic.user'
+    m_users['password'] =  DEFAULT_PASSWORD
+    m_users.to_sql('users', engine, if_exists='append', index=False)
 
-    users.to_sql('users', engine, if_exists='replace', index_label='id')
-
+    connection.close()

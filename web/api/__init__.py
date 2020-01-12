@@ -38,11 +38,13 @@ def create_app(test_config=None):
     api.add_resource(resources.UserLogoutAccess, '/logout/access')
     api.add_resource(resources.UserLogoutRefresh, '/logout/refresh')
     api.add_resource(resources.TokenRefresh, '/token/refresh')
-    api.add_resource(resources.AllUsers, '/users')
-    api.add_resource(resources.SecretResource, '/secret')
+    api.add_resource(resources.CurrentUser, '/user')
     api.add_resource(resources.Index, '/')
 
+    api.add_resource(resources.GameDetail, '/games/<id>')
     api.add_resource(resources.AllGames, '/games')
+    api.add_resource(resources.GameRecommendations, '/recommendations')
+    api.add_resource(resources.GameRating, '/rate')
     api.add_resource(resources.AllGenres, '/genres')
     api.add_resource(resources.AllPlatforms, '/platforms')
 
@@ -72,5 +74,9 @@ def create_app(test_config=None):
 
     # register error Handler
     app.register_error_handler(Exception, all_exception_handler)
+
+    # better variant to initialize model?
+    with app.app_context():
+        resources.GameRecommendations.initilizeImplicit()
 
     return app
