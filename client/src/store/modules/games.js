@@ -29,11 +29,11 @@ export default {
     }
   },
   actions: {
-    async retrieveGames ({ commit, dispatch }, { offset, limit }) {
+    async retrieveGames ({ commit }, { offset, limit }) {
       try {
         const res = await Vue.prototype.$http.get(
           concanateSting({ offset, limit }))
-        commit('addGames', res.data.data)
+        commit('addGames', res.data.games)
       } catch (err) {
         commit('authError', err.message)
       }

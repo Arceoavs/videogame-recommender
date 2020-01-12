@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 
 // Modules
 import games from './modules/games'
+import genres from './modules/genres'
 
 Vue.use(Vuex)
 
@@ -73,5 +74,5 @@ export default new Vuex.Store({
     loggedIn: state => !!state.token,
     authStatus: state => state.status
   },
-  modules: { games }
+  modules: { games, genres }
 })

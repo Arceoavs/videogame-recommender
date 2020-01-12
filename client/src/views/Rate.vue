@@ -4,6 +4,33 @@ v-container(fluid)
     v-col(cols="10")
       h1.display-2.font-weight-bold Ratings
 
+  v-row(justify="center" align="start")
+    v-col(cols="10")
+      h2.display-1 Rate new games
+
+  v-row(justify="center" align="start")
+    v-col(cols="1")
+    v-col(cols="5")
+      v-autocomplete(outlined
+        dense
+        prepend-inner-icon="mdi-gamepad-variant-outline"
+        v-model="selectedGenres"
+        :items="sortedGenres"
+        item-text="name"
+        item-value="id"
+        chips
+        small-chips
+        multiple
+        placeholder="Filter genres")
+
+    v-col(cols="5")
+      v-text-field(outlined
+        dense
+        clearable
+        prepend-inner-icon="mdi-magnify"
+        placeholder="Search for games")
+    v-col(cols="1")
+
   v-row(justify="start" align="center")
     v-col.hide-sm-and-down(cols="1"
       align="right")
@@ -23,6 +50,7 @@ v-container(fluid)
       align="left")
       v-icon.next-button(size="50")
         | mdi-chevron-right
+
 </template>
 
 <script>
@@ -61,15 +89,17 @@ export default {
             spaceBetween: 10
           }
         }
-      }
+      },
+      selectedGenres: []
     }
   },
   computed: {
-    ...mapGetters(['sortedGames', 'range'])
+    ...mapGetters(['sortedGames', 'range', 'sortedGenres'])
 
   },
   mounted () {
     this.$store.dispatch('retrieveGames', { limit: 10 })
+    this.$store.dispatch('retrieveGenres')
   }
 }
 </script>
