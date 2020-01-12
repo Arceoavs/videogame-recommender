@@ -6,7 +6,7 @@ class RevokedToken(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     jti = db.Column(db.String(120))
 
-    def add(self):
+    def save(self):
         db.session.add(self)
         db.session.commit()
 

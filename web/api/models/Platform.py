@@ -36,5 +36,5 @@ class Platform(db.Model):
     @classmethod
     def return_all(cls):
         return {
-            'data': list(map(lambda p: p.to_json_dangerously, Platform.query.all()))
+            'platforms': list(map(lambda p: p.to_json_dangerously, Platform.query.all()))
         }
