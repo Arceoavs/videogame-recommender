@@ -76,7 +76,7 @@ def create_app(test_config=None):
     app.register_error_handler(Exception, all_exception_handler)
 
     # better variant to initialize model?
-    with app.app_context():
-        resources.GameRecommendations.initilizeImplicit()
+    # with app.app_context():
+    #     resources.GameRecommendations.initilizeImplicit()
 
     return app
