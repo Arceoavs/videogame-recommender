@@ -7,7 +7,6 @@ function concanateSting ({ offset, limit }) {
     if (offset) url += 'offset=' + offset + '&'
     if (limit) url += 'limit=' + limit
   }
-  console.log(url)
   return url
 }
 export default {
