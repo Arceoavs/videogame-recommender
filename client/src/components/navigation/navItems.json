@@ -14,7 +14,7 @@
   {
     "tag": "Team",
     "to": "contact",
-    "icon": "mdi-contact",
+    "icon": "mdi-account-group",
     "loggedIn": true
   },
   {
