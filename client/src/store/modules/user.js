@@ -1,7 +1,8 @@
 import Vue from 'vue'
 export default {
   state: {
-    userData: {}
+    userData: {},
+    forOnboardingNeeded: 10
   },
   mutations: {
     resetUser (state) {
@@ -22,6 +23,12 @@ export default {
     }
   },
   getters: {
-    ratings: state => state.userData.ratings
+    ratings: state => state.userData.ratings,
+    // True if less than 3 games already rated
+    onboarding: state =>
+      !(state.userData.ratings &&
+        state.userData.ratings.length >=
+        state.forOnboardingNeeded),
+    neededRatingsAmount: state => state.forOnboardingNeeded - state.userData.ratings.length
   }
 }

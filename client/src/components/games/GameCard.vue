@@ -74,7 +74,6 @@ export default {
   },
   methods: {
     async rate () {
-      console.log('hier')
       try {
         await this.$http.post('/rate', {
           game_id: this.game.id,
