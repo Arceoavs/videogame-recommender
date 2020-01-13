@@ -2,3 +2,4 @@
 
 # Redirect default Netlify subdomain to primary domain
 https://videogames-muenster.netlify.com/* https://www.vgr.best/:splat 301!
+/*    /index.html   200
