@@ -4,6 +4,7 @@ import Vuex from 'vuex'
 // Modules
 import games from './modules/games'
 import genres from './modules/genres'
+import userData from './modules/user'
 
 Vue.use(Vuex)
 
@@ -74,5 +75,5 @@ export default new Vuex.Store({
     loggedIn: state => !!state.token,
     authStatus: state => state.status
   },
-  modules: { games, genres }
+  modules: { games, genres, userData }
 })
