@@ -173,6 +173,7 @@ class GameRating(Resource):
         value = request.json['value']
         if value < 0 or value > 5:
             raise Exception('Rating value should be between 0 and 5')
+        Rating.query.filter(Rating.game_id==game_id, Rating.user_id==user_id).delete()
         rating = Rating(
             game_id=game_id,
             user_id=user_id,
