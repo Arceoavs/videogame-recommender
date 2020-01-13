@@ -4,7 +4,9 @@ swiper(:options="swiperOptions"
   @reachBeginning="$emit('reachEnd')")
   swiper-slide(v-for="game in games"
     :key="game.id")
-    GameCard(:game="game")
+    GameCard(:game="game"
+      @rated="$emit('rated')"
+      :key="componentKey")
   //- .swiper-button-next.swiper-button-white(slot="button-next")
   //- .swiper-button-prev.swiper-button-white(slot="button-prev")
 </template>
@@ -30,6 +32,7 @@ export default {
   },
   data () {
     return {
+      componentKey: 0,
       swiperOptions: {
         slidesPerView: this.slidesPerView,
         spaceBetween: this.spaceBetween,
@@ -52,6 +55,12 @@ export default {
           }
         }
       }
+    }
+  },
+  methods: {
+    rated () {
+      this.$emit('rated')
+      this.componentKey += 1
     }
   }
 }

@@ -10,14 +10,6 @@ function concanateSting ({ offset, limit }) {
   return url
 }
 
-async function retrieveGame (id) {
-  try {
-    const res = await Vue.prototype.$http.get('/games/' + id)
-    return res.data.game
-  } catch (err) {
-  }
-}
-
 export default {
   state: {
     games: [],
@@ -26,6 +18,7 @@ export default {
   mutations: {
     resetGames (state) {
       state.games = []
+      state.ratedGames = []
     },
     setRatedGames (state, games) {
       state.ratedGames = games
@@ -60,8 +53,12 @@ export default {
       await dispatch('retrieveUserData')
       const ratedGames = []
       rootState.userData.userData.ratings.forEach(async rating => {
-        const game = await retrieveGame(rating.game_id)
-        ratedGames.push(game)
+        try {
+          const res = await Vue.prototype.$http.get('/games/' + rating.game_id)
+          ratedGames.push(res.data.game)
+        } catch (err) {
+          commit('authError', err.message)
+        }
       })
       commit('setRatedGames', ratedGames)
     }

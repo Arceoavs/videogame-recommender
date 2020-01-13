@@ -35,9 +35,9 @@ v-card.card-outter(color="dp1"
       background-color="primary"
       color="yellow accent-4"
       dense
-      half-increments
       hover
-      size="18")
+      size="18"
+      @input="rate")
 
   v-dialog(v-model="dialog"
     width="500")
@@ -48,6 +48,7 @@ v-card.card-outter(color="dp1"
 
 <script>
 import GameDetails from '@/components/games/GameDetails'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'GameCard',
@@ -61,6 +62,37 @@ export default {
     return {
       rating: 0,
       dialog: false
+    }
+  },
+  computed: {
+    ...mapGetters(['ratings'])
+  },
+  mounted () {
+    this.ratings.forEach(rating => {
+      if (rating.game_id === this.game.id) { this.rating = rating.value / 2 }
+    })
+  },
+  methods: {
+    async rate () {
+      console.log('hier')
+      try {
+        await this.$http.post('/rate', {
+          game_id: this.game.id,
+          value: this.rating
+        })
+      } catch (err) {
+        console.log(err)
+      } finally {
+        this.$emit('rated')
+        await this.$store.dispatch('retrieveGamesRatedByUser')
+        await this.$store.dispatch('retrieveUserData')
+      }
+    },
+    alreadyRated () {
+      this.ratings.forEach(rating => {
+        if (rating.game_id === this.game.id) return true
+      })
+      return false
     }
   }
 }
