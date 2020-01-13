@@ -67,7 +67,7 @@ class Game(db.Model):
 
     @classmethod
     def return_recommendations(self, game_ids):
-        return {'recommendations': list(map(lambda g: g.to_json, self.query.filter(self.id.in_(game_ids)).all()))}
+        return {'recommendations': [g.to_json for g in self.query.filter(self.id.in_(game_ids)).all()]}
 
     @classmethod
     def return_by_id(self, id):
@@ -81,4 +81,4 @@ class Game(db.Model):
 
     @classmethod
     def return_all(self, offset, limit):
-        return {'games': list(map(lambda g: g.to_json, self.query.order_by(Game.id).offset(offset).limit(limit).all()))}
+        return {'games': [g.to_json for g in self.query.order_by(Game.id).offset(offset).limit(limit).all()]}
