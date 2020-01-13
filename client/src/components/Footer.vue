@@ -6,26 +6,22 @@ v-footer(padless elevation="2")
       v-btn(dark
         text
         small
-        v-on="on"
         href="mailto:info@vgr.best")
         | Contact
 
       v-btn(dark
         text
-        small
-        v-on="on")
+        small)
         | Imprint
 
       v-btn(dark
         text
-        small
-        v-on="on")
+        small)
         | Privacy
 
       v-btn(dark
         text
-        small
-        v-on="on")
+        small)
         | Terms
 
       | &copy; {{new Date().getFullYear()}} - VGR
