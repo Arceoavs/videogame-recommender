@@ -80,7 +80,7 @@ export default {
           value: this.rating
         })
       } catch (err) {
-        console.log(err)
+
       } finally {
         this.$emit('rated')
         await this.$store.dispatch('retrieveGamesRatedByUser')
