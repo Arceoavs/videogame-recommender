@@ -28,7 +28,7 @@ v-card.card-outter(color="dp1"
         small)
         | {{genre.name}}
 
-  v-card-actions.card-actions.text-center
+  v-card-actions.card-actions.text-center.font-weight-light
     | Rate this game:
     .mx-2 ({{rating}})
     v-rating(v-model="rating"
