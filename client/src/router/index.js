@@ -60,8 +60,20 @@ const routes = [
     }
   },
   {
+    path: '/contact',
+    name: 'contact',
+    meta: {
+      requiresAuth: false
+    },
+    component: () =>
+      import(/* webpackChunkName: "contact" */ '@/views/Contact.vue')
+  },
+  {
     path: '/*',
     name: '404',
+    meta: {
+      requiresAuth: false
+    },
     component: () =>
       import(/* webpackChunkName: "error" */ '@/views/errors/404.vue')
   }
