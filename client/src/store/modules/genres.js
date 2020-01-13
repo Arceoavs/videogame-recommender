@@ -4,6 +4,9 @@ export default {
     genres: []
   },
   mutations: {
+    resetGenres (state) {
+      state.genres = []
+    },
     setGenres (state, genres) {
       state.genres = genres
     }
