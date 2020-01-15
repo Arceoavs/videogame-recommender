@@ -32,6 +32,8 @@ with engine.connect() as connection:
     connection
   )
 
+  i_platforms = i_platforms[i_platforms.name != 'Nintendo eShop']
+
   ### Matching
 
   g_platforms['ws_name'] = g_platforms['name']
@@ -51,6 +53,9 @@ with engine.connect() as connection:
   g_platforms.loc[g_platforms.name == 'Jaguar', 'name'] = 'AtariJaguar'
   g_platforms.loc[g_platforms.name == 'TurboGrafx-CD', 'name'] = 'Turbografx-16/PCEngineCD'
   g_platforms.loc[g_platforms.name == 'TurboGrafx-16', 'name'] = 'TurboGrafx-16/PCEngine'
+  g_platforms.loc[g_platforms.name == 'iPad', 'name'] = 'iOS'
+  g_platforms.loc[g_platforms.name == 'iPod', 'name'] = 'iOS'
+  g_platforms.loc[g_platforms.name == 'iPhone', 'name'] = 'iOS'
 
   matching_pairs = ssj.edit_distance_join(
     g_platforms, i_platforms, 
@@ -81,6 +86,10 @@ with engine.connect() as connection:
   giantbomb_merged.loc[giantbomb_merged.ws_name == 'Nintendo eShop', 'ws_name'] = 'Nintendo'
   giantbomb_merged.loc[giantbomb_merged.ws_name == 'TurboGrafx-CD', 'ws_name'] = 'Turbografx-16/PC Engine CD'
   giantbomb_merged.loc[giantbomb_merged.ws_name == 'TurboGrafx-16', 'ws_name'] = 'Turbografx-16/PC Engine'
+  giantbomb_merged.loc[giantbomb_merged.ws_name == 'iPod', 'ws_name'] = 'iOS'
+  giantbomb_merged.loc[giantbomb_merged.ws_name == 'iPad', 'ws_name'] = 'iOS'
+  giantbomb_merged.loc[giantbomb_merged.ws_name == 'iPhone', 'ws_name'] = 'iOS'
+  
   #TODO: better manual matching?
 
   igdb_merged = matching_pairs.merge(
@@ -143,8 +152,6 @@ with engine.connect() as connection:
 
   keepDuplicate = merged_lookup[merged_lookup.duplicated(['name'],keep='first')]
   duplicateRows = merged_lookup[merged_lookup.duplicated(['name'],keep='last')]
-
-  #merged_lookup = merged_lookup.drop_duplicates(['name'], keep='first')
   
   for dup, id in zip(duplicateRows['id'], keepDuplicate['id']):
     merged_lookup.loc[merged_lookup.id == dup, 'id'] = id
