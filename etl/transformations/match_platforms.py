@@ -141,42 +141,13 @@ with engine.connect() as connection:
   merged_lookup = merged_lookup.rename({'id_x': 'id', 'ws_name' : 'name', 'igdb_id_x': 'igdb_id'}, axis=1)
   merged_lookup = merged_lookup.drop_duplicates()
 
-  duplicateRows = merged_lookup[merged_lookup.duplicated(['name'],keep=False)]
+  keepDuplicate = merged_lookup[merged_lookup.duplicated(['name'],keep='first')]
+  duplicateRows = merged_lookup[merged_lookup.duplicated(['name'],keep='last')]
 
-  merged_lookup = merged_lookup.drop_duplicates(['name'], keep='first')
- 
+  #merged_lookup = merged_lookup.drop_duplicates(['name'], keep='first')
   
-  i_id = -1
-  g_id = -1
-  m_id = -1
-  dic = dict()
-
-  for name,igdb_id,giantbomb_id,metacritic_name in zip(duplicateRows['name'],duplicateRows['igdb_id'],duplicateRows['giantbomb_id'],duplicateRows['metacritic_name']):
-    if igdb_id == i_id:
-      dic[name] = 'igdb_id'
-    if giantbomb_id == g_id:
-      dic[name] = 'giantbomb_id'
-    if metacritic_name == m_id:
-      dic[name] = 'metacritic_name'
-    i_id=igdb_id
-    g_id=giantbomb_id
-    m_id=metacritic_name
-  
-  for x,y in dic.items():
-    duplicate = duplicateRows.loc[duplicateRows['name']==x]
-    duplicate['igdb_id'] = duplicate['igdb_id'].astype(int)
-    duplicate['giantbomb_id'] = duplicate['giantbomb_id'].astype(int)
-    if x in "PC":
-      duplicateAgg = duplicate.groupby('name').igdb_id
-      duplicateAgg = pd.concat([duplicateAgg.apply(list), duplicateAgg.count()], axis=1, keys=['igdb_id', 'number'])
-    if x in "Commodore C64/128":
-      duplicateAgg2 = duplicate.groupby('name').giantbomb_id
-      duplicateAgg2 = pd.concat([duplicateAgg2.apply(list), duplicateAgg2.count()], axis=1, keys=['giantbomb_id', 'number'])
-
-  for id in duplicateAgg['igdb_id']:
-    merged_lookup.loc[merged_lookup.name=='PC', 'igdb_id'] = ",".join(map(str, id))
-  for id in duplicateAgg2['giantbomb_id']:
-    merged_lookup.loc[merged_lookup.name=='Commodore C64/128', 'giantbomb_id'] = ",".join(map(str, id))
+  for dup, id in zip(duplicateRows['id'], keepDuplicate['id']):
+    merged_lookup.loc[merged_lookup.id == dup, 'id'] = id
 
   merged_lookup.loc[merged_lookup.metacritic_name == 'NintendoDS', 'metacritic_name'] = 'DS'
   merged_lookup.loc[merged_lookup.metacritic_name == 'Nintendo3DS', 'metacritic_name'] = '3DS'
@@ -200,7 +171,7 @@ with engine.connect() as connection:
     """
     DROP TABLE IF EXISTS platforms;
     CREATE TABLE platforms (
-      id int NOT NULL PRIMARY KEY,
+      id int NOT NULL,
       name varchar(255)
     );
     INSERT INTO platforms
