@@ -66,24 +66,24 @@ class Game(db.Model):
         return {'games': [g.to_json for g in self.query\
                                 .filter(Game.title.contains(title))\
                                 .order_by(Game.id).offset(offset).limit(limit).all()]}
+                                
+    @classmethod
+    def return_searchtitle_genre(self, offset, limit, title, genres2):
+
+        return {'games': [g.to_json for g in self.query\
+                                .join(Game.genres, aliased = True)\
+                                .filter(Genre.id.in_(genres2))\
+                                .filter(Game.title.contains(title))\
+                                .order_by(Game.id).offset(offset).limit(limit).all()]}
+                                
     @classmethod
     def return_all(self, offset, limit):
         return {'games': [g.to_json for g in self.query\
                                 .join(Game.genres, aliased=True)\
                                 .filter_by(id=2).order_by(Game.id).offset(offset).limit(limit).all()]}
-    @classmethod
-    def return_fgenres2(self, offset, limit, genres2):
-        _query = self.query\
-                      .join(Game.genres, aliased = True)
-        genres3 = ''.join(i for i in genres2 if i.isdigit())
-        for gid in genres3:
-            _query = _query.filter(Genre.id.contains(genres3))
-            
-        _query = _query.order_by(Game.id).offset(offset).limit(limit)
-        return {'games': [g.to_json for g in _query.all()]}        
 
     @classmethod
-    def return_fgenres(self, offset, limit, genres2):
+    def return_bygenres(self, offset, limit, genres2):
         _query = self.query\
                       .join(Game.genres, aliased = True)\
                       .filter(Genre.id.in_(genres2))\

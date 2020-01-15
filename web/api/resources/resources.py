@@ -131,15 +131,16 @@ class AllGames(Resource):
         args = GAME_PARSER.parse_args()
         offset = 0 if args.offset is None else args.offset
         limit = 100 if args.limit is None else args.limit
-        if args.search is None:
-            search = args.search
-        else:
-            return Game.return_searchtitle(offset, limit, args.search)
         genres = args.genres
+        if args.search is not None:
+            if args.genres is not None:
+                return Game.return_searchtitle_genre(offset,limit,args.search, genres.split(","))
+            else:
+                return Game.return_searchtitle(offset, limit, args.search)
         if args.genres is None:
             search = args.search
         else:
-            return Game.return_fgenres(offset, limit, genres.split(",")) 
+            return Game.return_bygenres(offset, limit, genres.split(",")) 
         return Game.return_all(offset, limit)
 
 class AllGenres(Resource):
