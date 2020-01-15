@@ -9,7 +9,7 @@ from flask_jwt_extended import (
     )
 from api.models import (
     Game, 
-    Genre,
+    #Genre,
     Platform,
     RevokedToken,
     User,
@@ -123,12 +123,23 @@ class SecretResource(Resource):
 GAME_PARSER = reqparse.RequestParser()
 GAME_PARSER.add_argument('offset', type=int)
 GAME_PARSER.add_argument('limit', type=int)
+GAME_PARSER.add_argument('genres')
+GAME_PARSER.add_argument('search')
 
 class AllGames(Resource):
     def get(self):
         args = GAME_PARSER.parse_args()
         offset = 0 if args.offset is None else args.offset
         limit = 100 if args.limit is None else args.limit
+        if args.search is None:
+            search = args.search
+        else:
+            return Game.return_searchtitle(offset, limit, args.search)
+        genres = args.genres
+        if args.genres is None:
+            search = args.search
+        else:
+            return Game.return_fgenres(offset, limit, genres.split(",")) 
         return Game.return_all(offset, limit)
 
 class AllGenres(Resource):
