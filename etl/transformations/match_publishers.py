@@ -12,7 +12,7 @@ with engine.connect() as connection:
 
     igdb_publishers = pd.read_sql_query(
         ''' 
-        SELECT max(id) AS id, name AS publisher
+        SELECT min(id) AS id, name AS publisher
         FROM igdb.stage_companies
         WHERE name IS NOT NULL
         GROUP BY name;
@@ -22,7 +22,7 @@ with engine.connect() as connection:
 
     metacritic_publishers: DataFrame = pd.read_sql_query(
         ''' 
-        SELECT max(id) AS id, publisher AS publisher
+        SELECT min(id) AS id, publisher AS publisher
                 FROM metacritic.stage_games
                 WHERE publisher IS NOT NULL
         		GROUP BY publisher;
