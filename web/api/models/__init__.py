@@ -4,15 +4,19 @@
 from .base import db
 from .Game import Game
 from .Genre import Genre
-from .User import User
+from .Platform import Platform
+from .Rating import Rating
 from .RevokedToken import RevokedToken
+from .User import User
 
 __all__ = [
   'db', 
   'Game',
   'Genre', 
+  'Platform',
+  'Rating',
+  'RevokedToken',
   'User',
-  'RevokedToken'
 ]
 
 # You must import all of the new Models you create to this page

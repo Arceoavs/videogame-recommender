@@ -2,17 +2,17 @@ from .base import db
 from .Game import Game
 
 
-class Genre(db.Model):
-    __tablename__ = "genres"
+class Platform(db.Model):
+    __tablename__ = "platforms"
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
 
-    def __init__(self, name):
+    def __init__(self, name: str):
         self.name = name
 
     def __repr__(self):
-        return f'<Genre {self.name}>'
+        return f'<Platform {self.name}>'
 
     @property
     def to_json(self):
@@ -23,8 +23,8 @@ class Genre(db.Model):
 
     @property
     def to_json_dangerously(self):
-        # https://gist.github.com/hest/8798884
-        q = db.session.query(Genre).filter_by(id=self.id).join(Game.genres)
+        q = db.session.query(Platform).filter_by(
+            id=self.id).join(Game.platforms)
         count = db.session.execute(q.statement.with_only_columns(
             [db.func.count()]).order_by(None)).scalar()
         return {
@@ -34,7 +34,7 @@ class Genre(db.Model):
         }
 
     @classmethod
-    def return_all(self):
+    def return_all(cls):
         return {
-            'genres': list(map(lambda g: g.to_json_dangerously, self.query.all()))
+            'platforms': list(map(lambda p: p.to_json_dangerously, Platform.query.all()))
         }
