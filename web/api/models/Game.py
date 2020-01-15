@@ -1,6 +1,7 @@
 from .base import db
 from sqlalchemy import or_
 from .Genre import Genre
+from .Platform import Platform
 import string
 
 game_genres = db.Table('game_genres',
@@ -19,7 +20,6 @@ game_platforms = db.Table('game_platforms',
 
 class Game(db.Model):
     __tablename__ = 'games'
-
     id = db.Column(db.Integer, unique=True, primary_key=True)
     title = db.Column(db.String, nullable=False)
     description = db.Column(db.String)
@@ -34,7 +34,7 @@ class Game(db.Model):
         'Platform',
         secondary=game_platforms,
         lazy='subquery',
-        backref=db.backref('games', lazy=True, cascade='all, delete')
+        backref=db.backref('platforms', lazy=True, cascade='all, delete')
         )
 
     def __init__(self, title: str):
@@ -66,24 +66,47 @@ class Game(db.Model):
         return {'games': [g.to_json for g in self.query\
                                 .filter(Game.title.contains(title))\
                                 .order_by(Game.id).offset(offset).limit(limit).all()]}
+                                
+    @classmethod
+    def return_searchtitle_genre(self, offset, limit, title, genres2):
+
+        return {'games': [g.to_json for g in self.query\
+                                .join(Game.genres, aliased = True)\
+                                .filter(Genre.id.in_(genres2))\
+                                .filter(Game.title.contains(title))\
+                                .order_by(Game.id).offset(offset).limit(limit).all()]}
+                                
+    @classmethod
+    def return_searchtitle_platform(self, offset, limit, title, platform2):
+
+        return {'games': [g.to_json for g in self.query\
+                                .join(Game.platforms, aliased = True)\
+                                .filter(Platform.id.in_(platform2))\
+                                .filter(Game.title.contains(title))\
+                                .order_by(Game.id).offset(offset).limit(limit).all()]}
+                                
     @classmethod
     def return_all(self, offset, limit):
         return {'games': [g.to_json for g in self.query\
-                                .join(Game.genres, aliased=True)\
-                                .filter_by(id=2).order_by(Game.id).offset(offset).limit(limit).all()]}
+                                .order_by(Game.id).offset(offset).limit(limit).all()]}
     @classmethod
-    def return_fgenres2(self, offset, limit, genres2):
+    def return_alls(self):
         _query = self.query\
-                      .join(Game.genres, aliased = True)
-        genres3 = ''.join(i for i in genres2 if i.isdigit())
-        for gid in genres3:
-            _query = _query.filter(Genre.id.contains(genres3))
-            
-        _query = _query.order_by(Game.id).offset(offset).limit(limit)
-        return {'games': [g.to_json for g in _query.all()]}        
+                        .order_by(Game.id)
+        return _query
+    
+    @classmethod
+    def return_byplatform(self, offset, limit, platform2):
+        _query = self.query\
+                      .join(Game.platforms, aliased = True)\
+                      .filter(Platform.id.in_(platform2))\
+                      .order_by(Game.id)\
+                      .offset(offset)\
+                      .limit(limit)
+        return {'games': [g.to_json for g in _query.all()]}                             
 
     @classmethod
-    def return_fgenres(self, offset, limit, genres2):
+    def return_bygenres(self, offset, limit, genres2):
         _query = self.query\
                       .join(Game.genres, aliased = True)\
                       .filter(Genre.id.in_(genres2))\

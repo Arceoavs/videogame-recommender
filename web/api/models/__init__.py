@@ -2,9 +2,9 @@
 # initializing db in api.models.base instead of in api.__init__.py
 # to prevent circular dependencies
 from .base import db
-from .Game import Game
-from .Genre import Genre
-from .Platform import Platform
+from .DataModel import Game
+from .DataModel import Genre
+from .DataModel import Platform
 from .RevokedToken import RevokedToken
 from .User import User
 
