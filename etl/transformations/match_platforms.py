@@ -45,9 +45,6 @@ with engine.connect() as connection:
   g_platforms.loc[g_platforms.name == 'Commodore64', 'name'] = 'CommodoreC64/128'
   g_platforms.loc[g_platforms.name == 'Commodore128', 'name'] = 'CommodoreC64/128'
   g_platforms.loc[g_platforms.name == 'Genesis', 'name'] = 'SegaMegaDrive/Genesis'
-  g_platforms.loc[g_platforms.name == 'Saturn', 'name'] = 'SegaSaturn'
-  g_platforms.loc[g_platforms.name == 'Nintendo3DSeShop', 'name'] = 'Nintendo3DS'
-  g_platforms.loc[g_platforms.name == 'NintendoeShop', 'name'] = 'Nintendo'
   g_platforms.loc[g_platforms.name == 'Jaguar', 'name'] = 'AtariJaguar'
   g_platforms.loc[g_platforms.name == 'TurboGrafx-CD', 'name'] = 'Turbografx-16/PCEngineCD'
   g_platforms.loc[g_platforms.name == 'TurboGrafx-16', 'name'] = 'TurboGrafx-16/PCEngine'
@@ -75,17 +72,11 @@ with engine.connect() as connection:
   giantbomb_merged.loc[giantbomb_merged.ws_name == 'Commodore 64', 'ws_name'] = 'Commodore C64/128'
   giantbomb_merged.loc[giantbomb_merged.ws_name == 'Commodore 128', 'ws_name'] = 'Commodore C64/128'
   giantbomb_merged.loc[giantbomb_merged.ws_name == 'Genesis', 'ws_name'] = 'Sega Mega Drive/Genesis'
-  giantbomb_merged.loc[giantbomb_merged.ws_name == 'Saturn', 'ws_name'] = 'Sega Saturn'
   giantbomb_merged.loc[giantbomb_merged.ws_name == 'Jaguar', 'ws_name'] = 'Atari Jaguar'
-  giantbomb_merged.loc[giantbomb_merged.ws_name == 'Nintendo 3DS eShop', 'ws_name'] = 'Nintendo 3DS'
-  giantbomb_merged.loc[giantbomb_merged.ws_name == 'Nintendo eShop', 'ws_name'] = 'Nintendo'
   giantbomb_merged.loc[giantbomb_merged.ws_name == 'TurboGrafx-CD', 'ws_name'] = 'Turbografx-16/PC Engine CD'
   giantbomb_merged.loc[giantbomb_merged.ws_name == 'TurboGrafx-16', 'ws_name'] = 'Turbografx-16/PC Engine'
   #TODO: better manual matching?
 
-  for i in giantbomb_merged['ws_name']:
-    if i in "Nintendo 3DS eShop":
-      print(i)
 
   igdb_merged = matching_pairs.merge(
      i_platforms, left_on='igdb_id', right_on='id', how='outer'
@@ -170,6 +161,7 @@ with engine.connect() as connection:
     duplicate = duplicateRows.loc[duplicateRows['name']==x]
     duplicate['igdb_id'] = duplicate['igdb_id'].astype(int)
     duplicate['giantbomb_id'] = duplicate['giantbomb_id'].astype(int)
+    print(duplicate)
     if x in "PC":
       duplicateAgg = duplicate.groupby('name').igdb_id
       duplicateAgg = pd.concat([duplicateAgg.apply(list), duplicateAgg.count()], axis=1, keys=['igdb_id', 'number'])
