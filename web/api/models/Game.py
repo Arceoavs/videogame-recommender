@@ -24,6 +24,7 @@ class Game(db.Model):
     title = db.Column(db.String, nullable=False)
     description = db.Column(db.String)
     year = db.Column(db.Integer)
+    image_url = db.Column(db.String)
     genres = db.relationship(
         'Genre',
         secondary=game_genres,
@@ -59,6 +60,7 @@ class Game(db.Model):
             'title': self.title,
             'description': self.description,
             'year': self.year,
+            'image_url': self.image_url,
             'genres': genres,
             'platforms': platforms,
             'ratings_count': ratings_len,

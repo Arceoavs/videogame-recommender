@@ -4,7 +4,10 @@ import pandas as pd
 from queries import (
   select_giantbomb_games_with_integrated_metadata, 
   select_igdb_games_with_integrated_metadata, 
-  select_metacritic_games_with_integrated_metadata
+  select_metacritic_games_with_integrated_metadata,
+  select_igdb_images,
+  select_giantbomb_images,
+  select_metacritic_images
 )
 from utilities import engine
 
@@ -93,14 +96,24 @@ with engine.connect() as connection:
   grouped['year'] = grouped['year'].apply(lambda t: t[0] if len(t) > 0 else np.NaN)
   grouped['genre_ids'] = grouped['genre_ids'].apply(lambda g: ', '.join(list(set(g))))
   grouped['platform_ids'] = grouped['platform_ids'].apply(lambda p: ', '.join(list(set(p))))
+
+  print('[Integrate Games] Adding image URLs')
+  igdb_images = select_igdb_images(connection)
+  giantbomb_images = select_giantbomb_images(connection)
+  metacritic_images = select_metacritic_images(connection)
+  unioned_images = pd.concat([pd.concat([igdb_images, giantbomb_images], ignore_index=True), metacritic_images],
+                             ignore_index=True)
+  unique_images = unioned_images.groupby('id').first().reset_index()
+
+  grouped = grouped.merge(unique_images, how='left', left_on='id', right_on='id')
   
   if debug:
     grouped.to_sql('debug_games_joined_and_grouped', engine, schema='lookup', if_exists='replace', index=False)
 
 
   # Create the dataframe for final games table
-  integrated_games = grouped[['id', 'title', 'description', 'year']]
-  
+  integrated_games = grouped[['id', 'title', 'description', 'year', 'image_url']]
+
   # Create the dataframe for final games-genre-association table
   # We use a column exploding technique, see also:
   # https://medium.com/@sureshssarda/pandas-splitting-exploding-a-column-into-multiple-rows-b1b1d59ea12e
