@@ -174,10 +174,10 @@ class GameRating(Resource):
         user_id = user.id
         game_id = request.json['game_id']
         exclude = request.json['exclude'] if 'exclude' in request.json else False
-        value = request.json['value']
-        if value < 0 or value > 5:
+        value = request.json['value'] if not exclude else -0.5
+        if not exclude and (value < 0 or value > 5):
             raise Exception('Rating value should be between 0 and 5')
-        value = value * 2 if not exclude else -1
+        value = value * 2
         rating = Rating.query.filter(Rating.game_id==game_id, Rating.user_id==user_id).first()
         if rating:
             rating.value = value
