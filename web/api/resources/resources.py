@@ -198,7 +198,15 @@ class GameRating(Resource):
         return {'message': 'Your rating was successfully saved'}, 201
 
 
+class initializeModel(Resource):
+    def get(self):
+        GameRecommendations.initializeImplicit()
+        return {'message': 'The recommendation model was successfully (re)created.'}
+
 class GameRecommendations(Resource):
+
+    global is_trained
+    is_trained=False
 
     def initializeImplicit():
         print('[Implicit] Initializing Implicit model. This might take a while...')
@@ -215,25 +223,30 @@ class GameRecommendations(Resource):
         global model
         model = implicit.als.AlternatingLeastSquares(factors=50)
         model.fit(game_user_matrix)
+        global is_trained
+        is_trained=True
         print('[Implicit] Initializing completed')
 
     @jwt_required
     def get(self):
-        user_email = get_jwt_identity()
-        user_id = User.find_by_username(user_email).id
+        if is_trained == False:
+            return {'message': 'Model is not initialized. Please do so with /initModel'}
+        else:
+            user_email = get_jwt_identity()
+            user_id = User.find_by_username(user_email).id
 
-        # create new user profile to also include ratings and predict for users not in model
-        ratings = Rating.query.filter(Rating.user_id == user_id)
+            # create new user profile to also include ratings and predict for users not in model
+            ratings = Rating.query.filter(Rating.user_id == user_id)
 
-        game_ids_minus1 = np.array([r.game_id-1 for r in ratings])
-        user_ids_minus1 = np.array([0]*game_ids_minus1.size)
-        values = np.asarray([r.value for r in ratings])
+            game_ids_minus1 = np.array([r.game_id-1 for r in ratings])
+            user_ids_minus1 = np.array([0]*game_ids_minus1.size)
+            values = np.asarray([r.value for r in ratings])
 
-        user_profile = csr_matrix((values, (user_ids_minus1, game_ids_minus1)), shape=(
-            1, user_game_matrix.shape[1]))
+            user_profile = csr_matrix((values, (user_ids_minus1, game_ids_minus1)), shape=(
+                1, user_game_matrix.shape[1]))
 
-        rec = model.recommend(0, user_profile, 100, recalculate_user=True)
-        rec_conv = [[int(rec[0])+1, float(rec[1])] for rec in rec]
+            rec = model.recommend(0, user_profile, 100, recalculate_user=True)
+            rec_conv = [[int(rec[0])+1, float(rec[1])] for rec in rec]
 
-        game_ids = [r[0] for r in rec_conv]
-        return Game.return_recommendations(game_ids)
+            game_ids = [r[0] for r in rec_conv]
+            return Game.return_recommendations(game_ids)
