@@ -1,6 +1,7 @@
 """This module initializes the whole application for use as an API server"""
 import os
 import logging
+from threading import Timer
 
 from flask import Flask, request
 from flask_cors import CORS
@@ -13,7 +14,6 @@ from api.config import config
 from api.core import all_exception_handler
 from api.resources import resources
 from api.models import db
-
 
 # why we use application factories http://flask.pocoo.org/docs/1.0/patterns/appfactories/#app-factories
 def create_app(test_config=None):
@@ -41,7 +41,6 @@ def create_app(test_config=None):
     api.add_resource(resources.CurrentUser, '/user')
     api.add_resource(resources.Index, '/')
 
-    api.add_resource(resources.GameExclude, '/exclude')
     api.add_resource(resources.GameDetail, '/games/<id>')
     api.add_resource(resources.AllGames, '/games')
     api.add_resource(resources.GameRecommendations, '/recommendations')
@@ -77,8 +76,9 @@ def create_app(test_config=None):
     # register error Handler
     app.register_error_handler(Exception, all_exception_handler)
 
-    # better variant to initialize model?
     with app.app_context():
-        resources.GameRecommendations.initilizeImplicit()
+        # Wait 10 seconds before initializing Implicit
+        implicit = Timer(10.0, resources.GameRecommendations.initializeImplicit)
+        implicit.start()
 
     return app

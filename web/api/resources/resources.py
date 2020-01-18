@@ -168,16 +168,21 @@ class GameRating(Resource):
     @jwt_required
     def post(self):
         user_email = get_jwt_identity()
-        user_id = User.find_by_username(user_email).id
+        user = User.find_by_username(user_email)
+        if not user:
+            raise Exception(f'No user with email {user_email} found')
+        user_id = user.id
         game_id = request.json['game_id']
         value = request.json['value']
+        exclude = request.json['exclude'] if 'exclude' in request.json else False
         if value < 0 or value > 5:
             raise Exception('Rating value should be between 0 and 5')
         Rating.query.filter(Rating.game_id==game_id, Rating.user_id==user_id).delete()
         rating = Rating(
             game_id=game_id,
             user_id=user_id,
-            value=value * 2
+            value=value * 2 if not exclude else -1,
+            exclude_from_model=exclude
         )
         rating.save()
         # TODO:
@@ -185,30 +190,10 @@ class GameRating(Resource):
         # Imlicit_instance.recalculate()
         return {'message': 'Your rating was successfully saved'}, 201
 
-class GameExclude(Resource):
-
-    @jwt_required
-    def post(self):
-        user_email = get_jwt_identity()
-        user_id = User.find_by_username(user_email).id
-        game_id = request.json['game_id']
-        rating = Rating(
-            game_id=game_id,
-            user_id=user_id,
-            value=1,
-            exclude_from_model=expression.true()
-        )
-        rating.save()
-        # TODO:
-        # Implicit_instance.add(rating)
-        # Imlicit_instance.recalculate()
-        return {'message': 'Game will now be excluded from ratings and model.'}, 201
-
-
 
 class GameRecommendations(Resource):
 
-    def initilizeImplicit():
+    def initializeImplicit():
         print('[Implicit] Initializing Implicit model. This might take a while...')
         obj_ratings = Rating.query.filter(Rating.exclude_from_model == expression.false())
         game_ids_minus1 = np.array(
