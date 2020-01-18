@@ -2,20 +2,24 @@ import pandas as pd
 
 def select_metacritic_ratings(connection):
   return pd.read_sql_query(
-    ''' 
-    SELECT u.metacritic_name AS metacritic_user_name,
-           u.id              AS user_id,
-           g.metacritic_id   AS metacritic_game_id,
-           g.id              AS game_id,
-           r.userscore       rating
+    '''
+    SELECT u.id        AS user_id,
+           g.id        AS game_id,
+           r.userscore AS "value"
     FROM   metacritic.stage_user_comments r
-           INNER JOIN lookup.users u
-                   ON r.username = u.metacritic_name
-           INNER JOIN metacritic.stage_games s_g
-                   ON ( r.title = s_g.title
-                        AND r.platform = s_g.platform )
+           INNER JOIN (SELECT id,
+                              Split_part(username, '@metacritic.user', 1) AS
+                              username
+                       FROM   users
+                       WHERE  username LIKE '%%metacritic%%') u
+                   ON r.username = u.username
+           INNER JOIN (SELECT Min(id) AS id,
+                              title
+                       FROM   metacritic.stage_games m
+                       GROUP  BY title) m_g
+                   ON r.title = m_g.title
            INNER JOIN lookup.games g
-                   ON s_g.id = g.metacritic_id ;						
+                   ON m_g.id = g.metacritic_id 
     ''',
     connection
   )

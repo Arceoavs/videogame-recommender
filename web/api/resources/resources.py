@@ -1,4 +1,5 @@
 import datetime
+
 from flask import request, jsonify
 from flask_restful import Resource, reqparse
 from flask_jwt_extended import (
@@ -20,7 +21,7 @@ from api.models import (
 import implicit
 from scipy.sparse import csr_matrix
 import numpy as np
-
+from sqlalchemy.sql import expression
 
 AUTH_PARSER = reqparse.RequestParser()
 AUTH_PARSER.add_argument(
@@ -167,17 +168,30 @@ class GameRating(Resource):
     @jwt_required
     def post(self):
         user_email = get_jwt_identity()
-        user_id = User.find_by_username(user_email).id
+        user = User.find_by_username(user_email)
+        if not user:
+            raise Exception(f'No user with email {user_email} found')
+        user_id = user.id
         game_id = request.json['game_id']
-        value = request.json['value']
-        if value < 0 or value > 5:
+        exclude = request.json['exclude'] if 'exclude' in request.json else False
+        value = request.json['value'] if not exclude else -0.5
+        if not exclude and (value < 0 or value > 5):
             raise Exception('Rating value should be between 0 and 5')
-        rating = Rating(
-            game_id=game_id,
-            user_id=user_id,
-            value=value * 2
-        )
-        rating.save()
+        value = value * 2
+        rating = Rating.query.filter(Rating.game_id==game_id, Rating.user_id==user_id).first()
+        if rating:
+            rating.value = value
+            rating.exclude_from_model = exclude
+            rating.update()
+            return {'message': 'Your rating was successfully updated'}, 200
+        else:
+            rating = Rating(
+                game_id=game_id,
+                user_id=user_id,
+                value=value,
+                exclude_from_model=exclude
+            )
+            rating.save()
         # TODO:
         # Implicit_instance.add(rating)
         # Imlicit_instance.recalculate()
@@ -186,14 +200,14 @@ class GameRating(Resource):
 
 class GameRecommendations(Resource):
 
-    def initilizeImplicit():
+    def initializeImplicit():
         print('[Implicit] Initializing Implicit model. This might take a while...')
-        obj_ratings = Rating.query.all()
+        obj_ratings = Rating.query.filter(Rating.exclude_from_model == expression.false())
         game_ids_minus1 = np.array(
-            list(map(lambda r: r.game_id-1, obj_ratings)))
+            [r.game_id-1 for r in obj_ratings]) # operations take some while
         user_ids_minus1 = np.array(
-            list(map(lambda r: r.user_id-1, obj_ratings)))
-        values = np.asarray(list(map(lambda r: r.value, obj_ratings)))
+            [r.user_id-1 for r in obj_ratings])
+        values = np.asarray([r.value for r in obj_ratings])
         game_user_matrix = csr_matrix((values, (game_ids_minus1, user_ids_minus1)), shape=(
             Game.query.count(), user_ids_minus1.size))
         global user_game_matrix
@@ -211,9 +225,9 @@ class GameRecommendations(Resource):
         # create new user profile to also include ratings and predict for users not in model
         ratings = Rating.query.filter(Rating.user_id == user_id)
 
-        game_ids_minus1 = np.array(list(map(lambda r: r.game_id-1, ratings)))
+        game_ids_minus1 = np.array([r.game_id-1 for r in ratings])
         user_ids_minus1 = np.array([0]*game_ids_minus1.size)
-        values = np.asarray(list(map(lambda r: r.value, ratings)))
+        values = np.asarray([r.value for r in ratings])
 
         user_profile = csr_matrix((values, (user_ids_minus1, game_ids_minus1)), shape=(
             1, user_game_matrix.shape[1]))
@@ -221,5 +235,5 @@ class GameRecommendations(Resource):
         rec = model.recommend(0, user_profile, 100, recalculate_user=True)
         rec_conv = [[int(rec[0])+1, float(rec[1])] for rec in rec]
 
-        game_ids = list(map(lambda r: r[0], rec_conv))
+        game_ids = [r[0] for r in rec_conv]
         return Game.return_recommendations(game_ids)
