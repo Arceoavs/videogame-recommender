@@ -10,11 +10,12 @@
     :lineLinked="true"
     :lineOpacity="0.4"
     :linesDistance="150"
-    :moveSpeed="3"
+    :moveSpeed="0.3"
     :hoverEffect="true"
     hoverMode="grab"
     :clickEffect="true"
     clickMode="repulse")
+
   v-container.foreground
     v-row(justify="center" align="start")
       v-col(cols="12")
@@ -35,14 +36,14 @@
             | Rate new games
 
       v-row.mt-2(justify="space-between" align="center" no-gutters)
-        v-col(cols="12" lg="3" md="3" sm="3")
+        v-col(cols="12" lg="3" md="3")
           v-text-field(outlined
             dense
             clearable
             prepend-inner-icon="mdi-magnify"
             placeholder="Search for games")
 
-        v-col(cols="5" lg="3" md="3" sm="4")
+        v-col(cols="5" lg="3" md="3" sm="5")
           v-autocomplete(outlined
             dense
             prepend-inner-icon="mdi-gamepad-variant-outline"
@@ -55,7 +56,7 @@
             multiple
             placeholder="Filter platforms")
 
-        v-col(cols="5" lg="3" md="3" sm="3")
+        v-col(cols="5" lg="3" md="3" sm="5")
           v-autocomplete(outlined
             dense
             prepend-inner-icon="mdi-format-list-text"
@@ -169,7 +170,7 @@ export default {
         0 0 20px #FFC107;
 }
 .particles-js {
-  z-index: -1;
+  z-index: 0;
   position: fixed; /* Sit on top of the page content */
   width: 100%; /* Full width (cover the whole page) */
   height: 100%; /* Full height (cover the whole page) */
@@ -177,6 +178,5 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 0; /* Specify a stack order in case you're using a different order for other elements */
 }
 </style>
