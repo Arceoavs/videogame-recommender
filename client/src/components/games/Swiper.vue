@@ -5,6 +5,7 @@ swiper(:options="swiperOptions"
   swiper-slide(v-for="game in games"
     :key="game.id")
     GameCard(:game="game"
+      rateable
       @rated="$emit('rated')"
       :key="componentKey")
   //- .swiper-button-next.swiper-button-white(slot="button-next")
