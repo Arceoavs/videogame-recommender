@@ -2,8 +2,8 @@
 v-card.card-outter(color="dp1"
   outlined
   height="500px")
-  v-skeleton-loader(class="mx-auto"
-    type="image")
+  v-img.mx-auto(:src="game.image_url"
+    height="200")
 
   v-card-title
     .overline.mr-3(v-for="platform in game.platforms"
