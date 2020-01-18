@@ -173,18 +173,25 @@ class GameRating(Resource):
             raise Exception(f'No user with email {user_email} found')
         user_id = user.id
         game_id = request.json['game_id']
-        value = request.json['value']
         exclude = request.json['exclude'] if 'exclude' in request.json else False
+        value = request.json['value']
         if value < 0 or value > 5:
             raise Exception('Rating value should be between 0 and 5')
-        Rating.query.filter(Rating.game_id==game_id, Rating.user_id==user_id).delete()
-        rating = Rating(
-            game_id=game_id,
-            user_id=user_id,
-            value=value * 2 if not exclude else -1,
-            exclude_from_model=exclude
-        )
-        rating.save()
+        value = value * 2 if not exclude else -1
+        rating = Rating.query.filter(Rating.game_id==game_id, Rating.user_id==user_id).first()
+        if rating:
+            rating.value = value
+            rating.exclude_from_model = exclude
+            rating.update()
+            return {'message': 'Your rating was successfully updated'}, 200
+        else:
+            rating = Rating(
+                game_id=game_id,
+                user_id=user_id,
+                value=value,
+                exclude_from_model=exclude
+            )
+            rating.save()
         # TODO:
         # Implicit_instance.add(rating)
         # Imlicit_instance.recalculate()
