@@ -25,10 +25,13 @@ export default {
   getters: {
     ratings: state => state.userData.ratings,
     // True if less than 3 games already rated
-    onboarding: state =>
-      !(state.userData.ratings &&
+    onboarding: state => {
+      if (state.userData.ratings) {
+        return !(state.userData.ratings &&
         state.userData.ratings.length >=
-        state.forOnboardingNeeded),
+        state.forOnboardingNeeded)
+      }
+    },
     neededRatingsAmount: state => state.forOnboardingNeeded - state.userData.ratings.length
   }
 }
