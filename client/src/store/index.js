@@ -6,6 +6,7 @@ import games from './modules/games'
 import genres from './modules/genres'
 import platforms from './modules/platforms'
 import userData from './modules/user'
+import recommendations from './modules/recommendations'
 
 Vue.use(Vuex)
 
@@ -80,5 +81,9 @@ export default new Vuex.Store({
     loggedIn: state => !!state.token,
     authStatus: state => state.status
   },
-  modules: { games, genres, userData, platforms }
+  modules: { games,
+    genres,
+    userData,
+    platforms,
+    recommendations }
 })
