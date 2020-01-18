@@ -139,6 +139,7 @@ with engine.connect() as connection:
   print('[Integrate Games] Delete Flask table content')
   connection.execute('DELETE FROM game_genres')
   connection.execute('DELETE FROM game_platforms')
+  connection.execute('DELETE FROM ratings')
   connection.execute('DELETE FROM games')
 
   print('[Integrate Games] Load integrated data to database')
