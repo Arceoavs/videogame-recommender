@@ -16,7 +16,7 @@ v-img(:aspect-ratio="4/3"
             h2.display-1
               | The games you might want to try
           v-col(cols="6" sm="4" align="end")
-            v-btn(@click="$store.dispatch('retrieveRecommendations')"
+            v-btn(@click="reretrieve"
               color="primary")
               v-icon.mr-2 mdi-refresh
               | Refresh
@@ -54,10 +54,20 @@ export default {
     ...mapGetters(['onboarding',
       'neededRatingsAmount',
       'recommendations',
-      'recommendationsLoaded'])
+      'excludedRatings',
+      'recommendationsLoaded']),
+    filteredRecommendations () {
+      return this.recommendations.filter(rec => !this.excludedRatings.includes(rec))
+    }
   },
-  mounted () {
-    this.$store.dispatch('retrieveRecommendations')
+  async mounted () {
+    await this.reretrieve()
+  },
+  methods: {
+    async reretrieve () {
+      await this.$store.commit('resetRecommendations')
+      await this.$store.dispatch('retrieveRecommendations')
+    }
   }
 }
 </script>

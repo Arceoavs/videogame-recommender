@@ -10,6 +10,15 @@ export default {
     },
     setRecommendations (state, rec) {
       state.recommendations = rec
+    },
+    hideRecommendation (state, recommendationId) {
+      // Do not include recommendation any more
+      // Even before re-retrieving
+      for (var i = 0; i < state.recommendations.length; i++) {
+        if (state.recommendations[i].id === recommendationId) {
+          state.recommendations.splice(i, 1)
+        }
+      }
     }
   },
   actions: {

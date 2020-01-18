@@ -23,7 +23,18 @@ export default {
     }
   },
   getters: {
-    ratings: state => state.userData.ratings,
+    ratings: state => {
+      if (state.userData.ratings) {
+        return state.userData.ratings.filter(
+          rating => !rating.exlude_from_model)
+      }
+    },
+    excludedRatings: state => {
+      if (state.userData.ratings) {
+        return state.userData.ratings.filter(
+          rating => rating.exlude_from_model)
+      }
+    },
     // True if less than 3 games already rated
     onboarding: state => {
       if (state.userData.ratings) {

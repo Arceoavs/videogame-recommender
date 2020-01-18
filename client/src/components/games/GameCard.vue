@@ -42,7 +42,8 @@ v-card.card-outter(color="dp1"
 
   v-card-actions.card-actions(v-if="dismissible")
     v-btn.ml-3(color="error"
-      outlined)
+      outlined
+      @click="dismiss")
       v-icon mdi-close
       | Dismiss
 
@@ -83,7 +84,17 @@ export default {
   },
   methods: {
     async dismiss () {
+      try {
+        await this.$http.post('/rate', {
+          game_id: this.game.id,
+          exclude: true
+        })
+      } catch (err) {
 
+      } finally {
+        this.$store.commit('hideRecommendation', this.game.id)
+        await this.afterRated()
+      }
     },
     async rate () {
       try {
@@ -94,10 +105,13 @@ export default {
       } catch (err) {
 
       } finally {
-        this.$emit('rated')
-        await this.$store.dispatch('retrieveGamesRatedByUser')
-        await this.$store.dispatch('retrieveUserData')
+        await this.afterRated()
       }
+    },
+    async afterRated () {
+      this.$emit('rated')
+      await this.$store.dispatch('retrieveGamesRatedByUser')
+      await this.$store.dispatch('retrieveUserData')
     },
     alreadyRated () {
       this.ratings.forEach(rating => {
