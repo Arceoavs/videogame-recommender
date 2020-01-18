@@ -56,6 +56,7 @@ services:
       - .env
     ports:
       - 8080:8080
+    command: ["npm", "run", "serve", "--quiet", "--no-progress"]
     volumes:
       - "./client:/client:z"
       - "/client/node_modules"
