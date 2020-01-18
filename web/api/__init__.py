@@ -47,6 +47,7 @@ def create_app(test_config=None):
     api.add_resource(resources.GameRating, '/rate')
     api.add_resource(resources.AllGenres, '/genres')
     api.add_resource(resources.AllPlatforms, '/platforms')
+    api.add_resource(resources.initializeModel, '/initModel')
 
 
     # check environment variables to see which config to load
@@ -75,10 +76,4 @@ def create_app(test_config=None):
 
     # register error Handler
     app.register_error_handler(Exception, all_exception_handler)
-
-    with app.app_context():
-        # Wait 10 seconds before initializing Implicit
-        implicit = Timer(10.0, resources.GameRecommendations.initializeImplicit)
-        implicit.start()
-
     return app
