@@ -1,4 +1,5 @@
 import statistics
+import math
 import numpy as np
 import pandas as pd
 from queries import (
@@ -13,6 +14,7 @@ from utilities import engine
 
 debug = False # set this to True to see all steps
 
+# determines value by priority
 def determine_value(s1, s2, s3):
   if s1 is np.NaN:
     if s2 is np.NaN:
@@ -23,13 +25,19 @@ def determine_value(s1, s2, s3):
   return s1
 
 def determine_mean(s1, s2, s3):
-  if s1 is np.NaN:
-    if s2 is np.NaN:
-      if s3 is np.NaN:
-        return s3
-      return s3
-    return statistics.median([s2, s3])
-  return statistics.median([s1, s2, s3])
+  nmbrs = []
+  if not math.isnan(s1):
+    nmbrs.append(s1)
+  if not math.isnan(s2):
+    nmbrs.append(s2)
+  if not math.isnan(s3):
+    nmbrs.append(s3)
+  result = 'undefined'
+  if len(nmbrs) > 0:
+    return statistics.median(nmbrs)
+  else:
+    return np.NaN
+
 
 def union_lists(s1, s2, s3):
   union = set()
@@ -46,11 +54,11 @@ def union_lists(s1, s2, s3):
 
 with engine.connect() as connection:
 
-  check_genres = pd.read_sql_query('SELECT * FROM lookup.genres', connection)
+  check_genres = pd.read_sql_query('SELECT * FROM genres', connection)
   if len(check_genres) == 0:
-    print('[Integrate Games] Error: Please integrate platforms first')
+    print('[Integrate Games] Error: Please integrate genres first')
     exit()
-  check_platforms = pd.read_sql_query('SELECT * FROM lookup.platforms', connection)
+  check_platforms = pd.read_sql_query('SELECT * FROM platforms', connection)
   if len(check_platforms) == 0:
     print('[Integrate Games] Error: Please integrate platforms first')
     exit()
