@@ -76,6 +76,7 @@ class Game(db.Model):
                                 .filter(Game.title.contains(title))\
                                 .order_by(Game.id).offset(offset).limit(limit).all()]}
                                 
+
     @classmethod
     def return_searchtitle_platform(self, offset, limit, title, platform2):
 
@@ -103,7 +104,7 @@ class Game(db.Model):
                       .order_by(Game.id)\
                       .offset(offset)\
                       .limit(limit)
-        return {'games': [g.to_json for g in _query.all()]}                             
+        return {'games': [g.to_json for g in _query.all()]}  
 
     @classmethod
     def return_bygenres(self, offset, limit, genres2):
