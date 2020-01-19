@@ -11,7 +11,8 @@ v-footer(padless elevation="2")
 
       v-btn(dark
         text
-        small)
+        small
+        :to="{name: 'imprint'}")
         | Imprint
 
       v-btn(dark
