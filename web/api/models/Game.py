@@ -53,8 +53,9 @@ class Game(db.Model):
         platforms = []
         for platform in self.platforms:
             platforms.append(platform.to_json)
-        ratings_sum = sum(map(lambda rating: rating.value, self.ratings))
-        ratings_len = len(self.ratings)
+        filtered_ratings = list(filter(lambda r: not r.exclude_from_model, self.ratings))
+        ratings_sum = sum(map(lambda rating: rating.value, filtered_ratings))
+        ratings_len = len(filtered_ratings)
         return {
             'id': self.id,
             'title': self.title,
