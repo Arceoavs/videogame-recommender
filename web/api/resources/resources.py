@@ -11,17 +11,17 @@ from flask_jwt_extended import (
     get_raw_jwt
 )
 from api.models import (
-    Game,
-    Genre,
-    Platform,
-    Rating,
+    # Mode,
+    # Game,
+    # Genre,
+    # Platform,
+    DataModel,
     RevokedToken,
     User,
 )
-import implicit
-from scipy.sparse import csr_matrix
-import numpy as np
-from sqlalchemy.sql import expression
+from api.models.DataModel import Game
+from api.models.DataModel import Genre
+from api.models.DataModel import Platform
 
 AUTH_PARSER = reqparse.RequestParser()
 AUTH_PARSER.add_argument(
@@ -139,6 +139,7 @@ GAME_PARSER = reqparse.RequestParser()
 GAME_PARSER.add_argument('offset', type=int)
 GAME_PARSER.add_argument('limit', type=int)
 GAME_PARSER.add_argument('genres')
+GAME_PARSER.add_argument('platforms')
 GAME_PARSER.add_argument('search')
 
 
@@ -150,9 +151,17 @@ class AllGames(Resource):
         genres = args.genres
         if args.search is not None:
             if args.genres is not None:
-                return Game.return_searchtitle_genre(offset, limit, args.search, genres.split(","))
+                if args.platforms is not None:
+                    return Game.return_searchtitle_platform_genre(offset, limit, args.search, args.platforms.split(","), genres.split(","))
+                else:
+                    return Game.return_searchtitle_genre(offset, limit, args.search, genres.split(","))
             else:
-                return Game.return_searchtitle(offset, limit, args.search)
+                if args.platforms is not None:
+                    return Game.return_searchtitle_platform(offset, limit, args.search, args.platforms.split(","))
+                else:
+                    return Game.return_searchtitle(offset, limit, args.search)
+        if args.platforms is not None:
+            return Game.return_byplatform(offset, limit, args.platforms.split(","))
         if args.genres is None:
             search = args.search
         else:

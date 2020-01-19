@@ -1,5 +1,5 @@
 from .base import db
-from .Game import Game
+#from .Game import Game
 
 
 class Platform(db.Model):

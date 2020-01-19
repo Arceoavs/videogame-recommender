@@ -1,6 +1,7 @@
 from .base import db
 from sqlalchemy import or_
 from .Genre import Genre
+from .Platform import Platform
 import string
 
 game_genres = db.Table('game_genres',
@@ -22,7 +23,6 @@ game_platforms = db.Table('game_platforms',
 
 class Game(db.Model):
     __tablename__ = 'games'
-
     id = db.Column(db.Integer, unique=True, primary_key=True)
     title = db.Column(db.String, nullable=False)
     description = db.Column(db.String)
@@ -38,9 +38,8 @@ class Game(db.Model):
         'Platform',
         secondary=game_platforms,
         lazy='subquery',
-        backref=db.backref('games', lazy=True, cascade='all, delete')
+        backref=db.backref('platforms', lazy=True, cascade='all, delete')
     )
-    ratings = db.relationship('Rating', backref='game')
 
     def __init__(self, title: str):
         self.title = title
@@ -87,28 +86,34 @@ class Game(db.Model):
                           .order_by(Game.id).offset(offset).limit(limit).all()]}
 
     @classmethod
+    def return_searchtitle_platform(self, offset, limit, title, platform2):
+
+        return {'games': [g.to_json for g in self.query
+                          .join(Game.platforms, aliased=True)
+                          .filter(Platform.id.in_(platform2))
+                          .filter(Game.title.contains(title))
+                          .order_by(Game.id).offset(offset).limit(limit).all()]}
+
+    @classmethod
     def return_all(self, offset, limit):
         return {'games': [g.to_json for g in self.query
-                          .join(Game.genres, aliased=True)
-                          .filter_by(id=2).order_by(Game.id).offset(offset).limit(limit).all()]}
+                          .order_by(Game.id).offset(offset).limit(limit).all()]}
 
     @classmethod
-    def return_recommendations(self, game_ids):
-        return {'recommendations': [g.to_json for g in self.query.filter(self.id.in_(game_ids)).all()]}
+    def return_alls(self):
+        _query = self.query\
+            .order_by(Game.id)
+        return _query
 
     @classmethod
-    def return_by_id(self, id):
-        game = self.query.filter_by(id=id).first()
-        if game is None:
-            return {'game': None}
-        else:
-            game = game.to_json
-            game['user_rating'] = None  # TODO: Show user rating
-            return {'game': game}
-
-    @classmethod
-    def return_all(self, offset, limit):
-        return {'games': [g.to_json for g in self.query.order_by(Game.id).offset(offset).limit(limit).all()]}
+    def return_byplatform(self, offset, limit, platform2):
+        _query = self.query\
+            .join(Game.platforms, aliased=True)\
+            .filter(Platform.id.in_(platform2))\
+            .order_by(Game.id)\
+            .offset(offset)\
+            .limit(limit)
+        return {'games': [g.to_json for g in _query.all()]}
 
     @classmethod
     def return_bygenres(self, offset, limit, genres2):
