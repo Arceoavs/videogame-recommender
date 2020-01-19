@@ -69,6 +69,33 @@ const routes = [
       import(/* webpackChunkName: "contact" */ '@/views/Contact.vue')
   },
   {
+    path: '/terms',
+    name: 'terms',
+    meta: {
+      requiresAuth: false
+    },
+    component: () =>
+      import(/* webpackChunkName: "terms" */ '@/views/Terms.vue')
+  },
+  {
+    path: '/privacy',
+    name: 'privacy',
+    meta: {
+      requiresAuth: false
+    },
+    component: () =>
+      import(/* webpackChunkName: "privacy" */ '@/views/Privacy.vue')
+  },
+  {
+    path: '/imprint',
+    name: 'imprint',
+    meta: {
+      requiresAuth: false
+    },
+    component: () =>
+      import(/* webpackChunkName: "imprint" */ '@/views/Imprint.vue')
+  },
+  {
     path: '/*',
     name: '404',
     meta: {
