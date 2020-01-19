@@ -23,7 +23,8 @@ v-footer(padless elevation="2")
 
       v-btn(dark
         text
-        small)
+        small
+        :to="{name: 'terms'}")
         | Terms
 
       | &copy; {{new Date().getFullYear()}} - VGR
