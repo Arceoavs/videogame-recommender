@@ -192,10 +192,7 @@ class GameRating(Resource):
                 exclude_from_model=exclude
             )
             rating.save()
-        # TODO:
-        # Implicit_instance.add(rating)
-        # Imlicit_instance.recalculate()
-        return {'message': 'Your rating was successfully saved'}, 201
+            return {'message': 'Your rating was successfully saved'}, 201
 
 
 class initializeModel(Resource):
