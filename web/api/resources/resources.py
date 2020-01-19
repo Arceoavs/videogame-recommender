@@ -8,17 +8,12 @@ from flask_jwt_extended import (
     get_raw_jwt
     )
 from api.models import (
-    #Mode, 
-    #Game, 
-    #Genre,
-    #Platform,
-    DataModel,
+    Game, 
+    Genre,
+    Platform,
     RevokedToken,
     User,
     )
-from api.models.DataModel import Game
-from api.models.DataModel import Genre
-from api.models.DataModel import Platform
 
 AUTH_PARSER = reqparse.RequestParser()
 AUTH_PARSER.add_argument(
