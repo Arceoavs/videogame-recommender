@@ -1,7 +1,7 @@
 <template lang="pug">
 v-container#imprint
   v-row
-    v-col
+    v-col.text-justify
       h1 Impressum
 
       h2 Angaben gem&auml;&szlig; &sect; 5 TMG
