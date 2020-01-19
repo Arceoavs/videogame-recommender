@@ -1,11 +1,11 @@
 <template lang="pug">
 #ratings
   vue-particles.particles-js(color="#dedede"
-    :particleOpacity="0.7"
-    :particlesNumber="80"
-    shapeType="circle"
+    :particleOpacity="0.4"
+    :particlesNumber="50"
+    shapeType="polygon"
     :particleSize="4"
-    linesColor="#dedede"
+    linesColor="#FFC107"
     :linesWidth="1"
     :lineLinked="true"
     :lineOpacity="0.4"
