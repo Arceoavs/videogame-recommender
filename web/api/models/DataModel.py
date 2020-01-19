@@ -1,5 +1,6 @@
 from .base import db
 from sqlalchemy import or_
+from sqlalchemy import func
 import string
 
 game_genres = db.Table('game_genres',
@@ -64,7 +65,7 @@ class Game(db.Model):
     def return_searchtitle(self, offset, limit, title):
 
         return {'games': [g.to_json for g in self.query\
-                                .filter(Game.title.contains(title))\
+                                .filter(func.lower(Game.title).contains(func.lower(title)))\
                                 .order_by(Game.id).offset(offset).limit(limit).all()]}
                                 
     @classmethod
@@ -73,7 +74,7 @@ class Game(db.Model):
         return {'games': [g.to_json for g in self.query\
                                 .join(Game.genres, aliased = True)\
                                 .filter(Genre.id.in_(genres2))\
-                                .filter(Game.title.contains(title))\
+                                .filter(func.lower(Game.title).contains(func.lower(title)))\
                                 .order_by(Game.id).offset(offset).limit(limit).all()]}
                                 
     @classmethod
@@ -82,7 +83,7 @@ class Game(db.Model):
         return {'games': [g.to_json for g in self.query\
                                 .join(Game.platforms, aliased = True)\
                                 .filter(Platform.id.in_(platform2))\
-                                .filter(Game.title.contains(title))\
+                                .filter(func.lower(Game.title).contains(func.lower(title)))\
                                 .order_by(Game.id).offset(offset).limit(limit).all()]}
                                 
     @classmethod
@@ -93,7 +94,7 @@ class Game(db.Model):
                                 .filter(Platform.id.in_(platform2))\
                                 .join(Game.genres, aliased = True)\
                                 .filter(Genre.id.in_(genres2))\
-                                .filter(Game.title.contains(title))\
+                                .filter(func.lower(Game.title).contains(func.lower(title)))\
                                 .order_by(Game.id).offset(offset).limit(limit).all()]}
                                 
     @classmethod
