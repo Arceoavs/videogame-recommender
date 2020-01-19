@@ -1,4 +1,7 @@
 from .base import db
+from sqlalchemy import or_
+from .Genre import Genre
+import string
 
 game_genres = db.Table('game_genres',
                        db.Column('game_id', db.Integer, db.ForeignKey(
@@ -29,7 +32,7 @@ class Game(db.Model):
         'Genre',
         secondary=game_genres,
         lazy='subquery',
-        backref=db.backref('games', lazy=True, cascade='all, delete')
+        backref=db.backref('genres', lazy=True, cascade='all, delete')
     )
     platforms = db.relationship(
         'Platform',
@@ -68,6 +71,28 @@ class Game(db.Model):
         }
 
     @classmethod
+    def return_searchtitle(self, offset, limit, title):
+
+        return {'games': [g.to_json for g in self.query
+                          .filter(Game.title.contains(title))
+                          .order_by(Game.id).offset(offset).limit(limit).all()]}
+
+    @classmethod
+    def return_searchtitle_genre(self, offset, limit, title, genres2):
+
+        return {'games': [g.to_json for g in self.query
+                          .join(Game.genres, aliased=True)
+                          .filter(Genre.id.in_(genres2))
+                          .filter(Game.title.contains(title))
+                          .order_by(Game.id).offset(offset).limit(limit).all()]}
+
+    @classmethod
+    def return_all(self, offset, limit):
+        return {'games': [g.to_json for g in self.query
+                          .join(Game.genres, aliased=True)
+                          .filter_by(id=2).order_by(Game.id).offset(offset).limit(limit).all()]}
+
+    @classmethod
     def return_recommendations(self, game_ids):
         return {'recommendations': [g.to_json for g in self.query.filter(self.id.in_(game_ids)).all()]}
 
@@ -84,3 +109,13 @@ class Game(db.Model):
     @classmethod
     def return_all(self, offset, limit):
         return {'games': [g.to_json for g in self.query.order_by(Game.id).offset(offset).limit(limit).all()]}
+
+    @classmethod
+    def return_bygenres(self, offset, limit, genres2):
+        _query = self.query\
+            .join(Game.genres, aliased=True)\
+            .filter(Genre.id.in_(genres2))\
+            .order_by(Game.id)\
+            .offset(offset)\
+            .limit(limit)
+        return {'games': [g.to_json for g in _query.all()]}

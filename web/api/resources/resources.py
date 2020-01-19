@@ -138,6 +138,8 @@ class CurrentUser(Resource):
 GAME_PARSER = reqparse.RequestParser()
 GAME_PARSER.add_argument('offset', type=int)
 GAME_PARSER.add_argument('limit', type=int)
+GAME_PARSER.add_argument('genres')
+GAME_PARSER.add_argument('search')
 
 
 class AllGames(Resource):
@@ -145,6 +147,16 @@ class AllGames(Resource):
         args = GAME_PARSER.parse_args()
         offset = 0 if args.offset is None else args.offset
         limit = 100 if args.limit is None else args.limit
+        genres = args.genres
+        if args.search is not None:
+            if args.genres is not None:
+                return Game.return_searchtitle_genre(offset, limit, args.search, genres.split(","))
+            else:
+                return Game.return_searchtitle(offset, limit, args.search)
+        if args.genres is None:
+            search = args.search
+        else:
+            return Game.return_bygenres(offset, limit, genres.split(","))
         return Game.return_all(offset, limit)
 
 
@@ -178,7 +190,8 @@ class GameRating(Resource):
         if not exclude and (value < 0 or value > 5):
             raise Exception('Rating value should be between 0 and 5')
         value = value * 2
-        rating = Rating.query.filter(Rating.game_id==game_id, Rating.user_id==user_id).first()
+        rating = Rating.query.filter(
+            Rating.game_id == game_id, Rating.user_id == user_id).first()
         if rating:
             rating.value = value
             rating.exclude_from_model = exclude
@@ -203,16 +216,18 @@ class initializeModel(Resource):
         GameRecommendations.initializeImplicit()
         return {'message': 'The recommendation model was successfully (re)created.'}
 
+
 class GameRecommendations(Resource):
 
     global is_trained
-    is_trained=False
+    is_trained = False
 
     def initializeImplicit():
         print('[Implicit] Initializing Implicit model. This might take a while...')
-        obj_ratings = Rating.query.filter(Rating.exclude_from_model == expression.false())
+        obj_ratings = Rating.query.filter(
+            Rating.exclude_from_model == expression.false())
         game_ids_minus1 = np.array(
-            [r.game_id-1 for r in obj_ratings]) # operations take some while
+            [r.game_id-1 for r in obj_ratings])  # operations take some while
         user_ids_minus1 = np.array(
             [r.user_id-1 for r in obj_ratings])
         values = np.asarray([r.value for r in obj_ratings])
@@ -224,7 +239,7 @@ class GameRecommendations(Resource):
         model = implicit.als.AlternatingLeastSquares(factors=50)
         model.fit(game_user_matrix)
         global is_trained
-        is_trained=True
+        is_trained = True
         print('[Implicit] Initializing completed')
 
     @jwt_required
