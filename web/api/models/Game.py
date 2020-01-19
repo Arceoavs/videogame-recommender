@@ -70,7 +70,9 @@ class Game(db.Model):
 
     @classmethod
     def return_recommendations(self, game_ids):
-        return {'recommendations': [g.to_json for g in self.query.filter(self.id.in_(game_ids)).all()]}
+        results = self.query.filter(self.id.in_(game_ids)).all()
+        sorted_results = sorted(results, key = lambda x: game_ids.index(x.id))
+        return {'recommendations': [g.to_json for g in sorted_results]}
 
     @classmethod
     def return_by_id(self, id):
