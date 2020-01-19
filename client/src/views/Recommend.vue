@@ -9,6 +9,7 @@ v-img(:aspect-ratio="4/3"
           | Recommend
 
     OnboardingFirst#OnboardingNeeded(v-if="onboarding")
+
     #OnboardingDone.mt-2(v-else)
       #RecommendationsLoaded(v-if="recommendationsLoaded")
         v-row(justify="center" align="center")
@@ -24,8 +25,11 @@ v-img(:aspect-ratio="4/3"
         v-row(justify="center" align="start")
           v-col(v-for="recommendation in recommendations"
             cols="12" sm="8" md="6" lg="4")
-            GameCard(:game="recommendation"
-              dismissible)
+            v-hover(v-slot:default="{ hover }")
+              GameCard(:game="recommendation"
+                :elevation="hover ? 22 : 1"
+                dismissible)
+
       #Loading(v-else)
         v-row(justify="start" align="center")
           v-col(cols="12")

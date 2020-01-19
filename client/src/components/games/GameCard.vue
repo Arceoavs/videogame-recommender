@@ -1,7 +1,8 @@
 <template lang="pug">
 v-card.card-outter(color="dp1"
   outlined
-  height="500px")
+  height="500px"
+  :elevation="elevation")
   v-img.mx-auto(v-if="game.image_url"
     :src="game.image_url"
     height="200")
@@ -66,7 +67,8 @@ export default {
   props: {
     game: { type: Object, default: null },
     dismissible: { type: Boolean, default: false },
-    rateable: { type: Boolean, default: false }
+    rateable: { type: Boolean, default: false },
+    elevation: { type: Number, default: 0 }
   },
   data () {
     return {
