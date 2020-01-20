@@ -5,6 +5,7 @@ from .base import db
 from .Game import Game
 from .Genre import Genre
 from .Platform import Platform
+from .Rating import Rating
 from .RevokedToken import RevokedToken
 from .User import User
 
@@ -13,7 +14,8 @@ __all__ = [
   'Game',
   'Genre', 
   'Platform',
-  'RevokedToken'
+  'Rating',
+  'RevokedToken',
   'User',
 ]
 

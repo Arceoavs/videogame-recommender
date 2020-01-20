@@ -12,3 +12,5 @@ testing.postgresql==1.3.0
 flask-jwt-extended
 passlib
 flask-restful
+implicit==0.4.0
+pandas==0.25.3

@@ -10,8 +10,9 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(120), nullable=False)
+    ratings = db.relationship('Rating', backref='user')
 
-    def save_to_db(self):
+    def save(self):
         db.session.add(self)
         db.session.commit()
 
@@ -19,14 +20,24 @@ class User(db.Model):
     def find_by_username(cls, username):
         return cls.query.filter_by(username=username).first()
 
+    @property
+    def to_json(self):
+        ratings = []
+        for rating in self.ratings:
+            ratings.append(rating.to_json)
+        return {
+            'id': self.id,
+            'username': self.username,
+            'ratings': ratings,
+        }
+
+    @classmethod
+    def return_by_username(cls, username):
+        return {'user': cls.query.filter_by(username=username).first().to_json}
+
     @classmethod
     def return_all(cls):
-        def to_json(x):
-            return {
-                'username': x.username,
-                'password': x.password
-            }
-        return {'users': list(map(lambda x: to_json(x), User.query.all()))}
+        return {'users': [x.to_json for x in User.query.all()]}
 
     @classmethod
     def delete_all(cls):

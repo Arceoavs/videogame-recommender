@@ -1,6 +1,5 @@
 """This module initializes the whole application for use as an API server"""
 import os
-import logging
 
 from flask import Flask, request
 from flask_cors import CORS
@@ -13,7 +12,6 @@ from api.config import config
 from api.core import all_exception_handler
 from api.resources import resources
 from api.models import db
-
 
 # why we use application factories http://flask.pocoo.org/docs/1.0/patterns/appfactories/#app-factories
 def create_app(test_config=None):
@@ -38,13 +36,17 @@ def create_app(test_config=None):
     api.add_resource(resources.UserLogoutAccess, '/logout/access')
     api.add_resource(resources.UserLogoutRefresh, '/logout/refresh')
     api.add_resource(resources.TokenRefresh, '/token/refresh')
-    api.add_resource(resources.AllUsers, '/users')
-    api.add_resource(resources.SecretResource, '/secret')
+    api.add_resource(resources.CurrentUser, '/user')
     api.add_resource(resources.Index, '/')
 
+    api.add_resource(resources.GameDetail, '/games/<id>')
     api.add_resource(resources.AllGames, '/games')
+    api.add_resource(resources.GameRecommendations, '/recommendations')
+    api.add_resource(resources.GameRating, '/rate')
     api.add_resource(resources.AllGenres, '/genres')
     api.add_resource(resources.AllPlatforms, '/platforms')
+    api.add_resource(resources.initializeModel, '/initModel')
+
 
     # check environment variables to see which config to load
     env = os.environ.get("FLASK_ENV", "dev")
@@ -72,5 +74,4 @@ def create_app(test_config=None):
 
     # register error Handler
     app.register_error_handler(Exception, all_exception_handler)
-
     return app
