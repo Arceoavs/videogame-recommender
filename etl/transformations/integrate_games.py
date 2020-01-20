@@ -1,15 +1,20 @@
 import statistics
+import math
 import numpy as np
 import pandas as pd
 from queries import (
   select_giantbomb_games_with_integrated_metadata, 
   select_igdb_games_with_integrated_metadata, 
-  select_metacritic_games_with_integrated_metadata
+  select_metacritic_games_with_integrated_metadata,
+  select_igdb_images,
+  select_giantbomb_images,
+  select_metacritic_images
 )
 from utilities import engine
 
 debug = False # set this to True to see all steps
 
+# determines value by priority
 def determine_value(s1, s2, s3):
   if s1 is np.NaN:
     if s2 is np.NaN:
@@ -20,13 +25,19 @@ def determine_value(s1, s2, s3):
   return s1
 
 def determine_mean(s1, s2, s3):
-  if s1 is np.NaN:
-    if s2 is np.NaN:
-      if s3 is np.NaN:
-        return s3
-      return s3
-    return statistics.median([s2, s3])
-  return statistics.median([s1, s2, s3])
+  nmbrs = []
+  if not math.isnan(s1):
+    nmbrs.append(s1)
+  if not math.isnan(s2):
+    nmbrs.append(s2)
+  if not math.isnan(s3):
+    nmbrs.append(s3)
+  result = 'undefined'
+  if len(nmbrs) > 0:
+    return statistics.median(nmbrs)
+  else:
+    return np.NaN
+
 
 def union_lists(s1, s2, s3):
   union = set()
@@ -43,11 +54,11 @@ def union_lists(s1, s2, s3):
 
 with engine.connect() as connection:
 
-  check_genres = pd.read_sql_query('SELECT * FROM lookup.genres', connection)
+  check_genres = pd.read_sql_query('SELECT * FROM genres', connection)
   if len(check_genres) == 0:
-    print('[Integrate Games] Error: Please integrate platforms first')
+    print('[Integrate Games] Error: Please integrate genres first')
     exit()
-  check_platforms = pd.read_sql_query('SELECT * FROM lookup.platforms', connection)
+  check_platforms = pd.read_sql_query('SELECT * FROM platforms', connection)
   if len(check_platforms) == 0:
     print('[Integrate Games] Error: Please integrate platforms first')
     exit()
@@ -93,14 +104,24 @@ with engine.connect() as connection:
   grouped['year'] = grouped['year'].apply(lambda t: t[0] if len(t) > 0 else np.NaN)
   grouped['genre_ids'] = grouped['genre_ids'].apply(lambda g: ', '.join(list(set(g))))
   grouped['platform_ids'] = grouped['platform_ids'].apply(lambda p: ', '.join(list(set(p))))
+
+  print('[Integrate Games] Adding image URLs')
+  igdb_images = select_igdb_images(connection)
+  giantbomb_images = select_giantbomb_images(connection)
+  metacritic_images = select_metacritic_images(connection)
+  unioned_images = pd.concat([pd.concat([igdb_images, giantbomb_images], ignore_index=True), metacritic_images],
+                             ignore_index=True)
+  unique_images = unioned_images.groupby('id').first().reset_index()
+
+  grouped = grouped.merge(unique_images, how='left', left_on='id', right_on='id')
   
   if debug:
     grouped.to_sql('debug_games_joined_and_grouped', engine, schema='lookup', if_exists='replace', index=False)
 
 
   # Create the dataframe for final games table
-  integrated_games = grouped[['id', 'title', 'description', 'year']]
-  
+  integrated_games = grouped[['id', 'title', 'description', 'year', 'image_url']]
+
   # Create the dataframe for final games-genre-association table
   # We use a column exploding technique, see also:
   # https://medium.com/@sureshssarda/pandas-splitting-exploding-a-column-into-multiple-rows-b1b1d59ea12e
@@ -126,6 +147,7 @@ with engine.connect() as connection:
   print('[Integrate Games] Delete Flask table content')
   connection.execute('DELETE FROM game_genres')
   connection.execute('DELETE FROM game_platforms')
+  connection.execute('DELETE FROM ratings')
   connection.execute('DELETE FROM games')
 
   print('[Integrate Games] Load integrated data to database')

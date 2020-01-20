@@ -24,6 +24,7 @@ class Game(db.Model):
     title = db.Column(db.String, nullable=False)
     description = db.Column(db.String)
     year = db.Column(db.Integer)
+    image_url = db.Column(db.String)
     genres = db.relationship(
         'Genre',
         secondary=game_genres,
@@ -52,13 +53,15 @@ class Game(db.Model):
         platforms = []
         for platform in self.platforms:
             platforms.append(platform.to_json)
-        ratings_sum = sum(map(lambda rating: rating.value, self.ratings))
-        ratings_len = len(self.ratings)
+        filtered_ratings = [x for x in self.ratings if not x.exclude_from_model]
+        ratings_sum = sum(map(lambda rating: rating.value, filtered_ratings))
+        ratings_len = len(filtered_ratings)
         return {
             'id': self.id,
             'title': self.title,
             'description': self.description,
             'year': self.year,
+            'image_url': self.image_url,
             'genres': genres,
             'platforms': platforms,
             'ratings_count': ratings_len,
@@ -67,7 +70,9 @@ class Game(db.Model):
 
     @classmethod
     def return_recommendations(self, game_ids):
-        return {'recommendations': [g.to_json for g in self.query.filter(self.id.in_(game_ids)).all()]}
+        results = self.query.filter(self.id.in_(game_ids)).all()
+        sorted_results = sorted(results, key = lambda x: game_ids.index(x.id))
+        return {'recommendations': [g.to_json for g in sorted_results]}
 
     @classmethod
     def return_by_id(self, id):

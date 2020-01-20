@@ -168,47 +168,44 @@ class GameRating(Resource):
     @jwt_required
     def post(self):
         user_email = get_jwt_identity()
-        user_id = User.find_by_username(user_email).id
+        user = User.find_by_username(user_email)
+        if not user:
+            raise Exception(f'No user with email {user_email} found')
+        user_id = user.id
         game_id = request.json['game_id']
-        value = request.json['value']
-        if value < 0 or value > 5:
+        exclude = request.json['exclude'] if 'exclude' in request.json else False
+        value = request.json['value'] if not exclude else -0.5
+        if not exclude and (value < 0 or value > 5):
             raise Exception('Rating value should be between 0 and 5')
-        Rating.query.filter(Rating.game_id==game_id, Rating.user_id==user_id).delete()
-        rating = Rating(
-            game_id=game_id,
-            user_id=user_id,
-            value=value * 2
-        )
-        rating.save()
-        # TODO:
-        # Implicit_instance.add(rating)
-        # Imlicit_instance.recalculate()
-        return {'message': 'Your rating was successfully saved'}, 201
-
-class GameExclude(Resource):
-
-    @jwt_required
-    def post(self):
-        user_email = get_jwt_identity()
-        user_id = User.find_by_username(user_email).id
-        game_id = request.json['game_id']
-        rating = Rating(
-            game_id=game_id,
-            user_id=user_id,
-            value=1,
-            exclude_from_model=expression.true()
-        )
-        rating.save()
-        # TODO:
-        # Implicit_instance.add(rating)
-        # Imlicit_instance.recalculate()
-        return {'message': 'Game will now be excluded from ratings and model.'}, 201
+        value = value * 2
+        rating = Rating.query.filter(Rating.game_id==game_id, Rating.user_id==user_id).first()
+        if rating:
+            rating.value = value
+            rating.exclude_from_model = exclude
+            rating.update()
+            return {'message': 'Your rating was successfully updated'}, 200
+        else:
+            rating = Rating(
+                game_id=game_id,
+                user_id=user_id,
+                value=value,
+                exclude_from_model=exclude
+            )
+            rating.save()
+            return {'message': 'Your rating was successfully saved'}, 201
 
 
+class initializeModel(Resource):
+    def get(self):
+        GameRecommendations.initializeImplicit()
+        return {'message': 'The recommendation model was successfully (re)created.'}
 
 class GameRecommendations(Resource):
 
-    def initilizeImplicit():
+    global is_trained
+    is_trained=False
+
+    def initializeImplicit():
         print('[Implicit] Initializing Implicit model. This might take a while...')
         obj_ratings = Rating.query.filter(Rating.exclude_from_model == expression.false())
         game_ids_minus1 = np.array(
@@ -223,25 +220,30 @@ class GameRecommendations(Resource):
         global model
         model = implicit.als.AlternatingLeastSquares(factors=50)
         model.fit(game_user_matrix)
+        global is_trained
+        is_trained=True
         print('[Implicit] Initializing completed')
 
     @jwt_required
     def get(self):
-        user_email = get_jwt_identity()
-        user_id = User.find_by_username(user_email).id
+        if is_trained == False:
+            return {'message': 'Model is not initialized. Please do so with /initModel'}, 503
+        else:
+            user_email = get_jwt_identity()
+            user_id = User.find_by_username(user_email).id
 
-        # create new user profile to also include ratings and predict for users not in model
-        ratings = Rating.query.filter(Rating.user_id == user_id)
+            # create new user profile to also include ratings and predict for users not in model
+            ratings = Rating.query.filter(Rating.user_id == user_id)
 
-        game_ids_minus1 = np.array([r.game_id-1 for r in ratings])
-        user_ids_minus1 = np.array([0]*game_ids_minus1.size)
-        values = np.asarray([r.value for r in ratings])
+            game_ids_minus1 = np.array([r.game_id-1 for r in ratings])
+            user_ids_minus1 = np.array([0]*game_ids_minus1.size)
+            values = np.asarray([r.value for r in ratings])
 
-        user_profile = csr_matrix((values, (user_ids_minus1, game_ids_minus1)), shape=(
-            1, user_game_matrix.shape[1]))
+            user_profile = csr_matrix((values, (user_ids_minus1, game_ids_minus1)), shape=(
+                1, user_game_matrix.shape[1]))
 
-        rec = model.recommend(0, user_profile, 100, recalculate_user=True)
-        rec_conv = [[int(rec[0])+1, float(rec[1])] for rec in rec]
+            rec = model.recommend(0, user_profile, 100, recalculate_user=True)
+            rec_conv = [[int(rec[0])+1, float(rec[1])] for rec in rec]
 
-        game_ids = [r[0] for r in rec_conv]
-        return Game.return_recommendations(game_ids)
+            game_ids = [r[0] for r in rec_conv]
+            return Game.return_recommendations(game_ids)
