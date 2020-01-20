@@ -32,7 +32,9 @@ with engine.connect() as connection:
     connection
   )
 
+  # Drop those platforms that are shops instead of 'real' platforms
   i_platforms = i_platforms[i_platforms.name != 'Nintendo eShop']
+  g_platforms = g_platforms[g_platforms.name != 'Wii Shop']
 
   ### Matching
 
@@ -43,7 +45,8 @@ with engine.connect() as connection:
 
   i_platforms.loc[i_platforms.name == 'NintendoGameCube', 'name'] = 'GameCube'
   i_platforms.loc[i_platforms.name == 'CommodorePET', 'name'] = 'CommodorePET/CBM'
-  i_platforms.loc[i_platforms.name == 'PCDOS', 'name'] = 'PC' #multiple matches, drop_duplicates necessary!
+  i_platforms.loc[i_platforms.name == 'PCDOS', 'name'] = 'PC' 
+  i_platforms.loc[i_platforms.name == 'WiiWare', 'name'] = "Wii"
   g_platforms.loc[g_platforms.name == 'Commodore64', 'name'] = 'CommodoreC64/128'
   g_platforms.loc[g_platforms.name == 'Commodore128', 'name'] = 'CommodoreC64/128'
   g_platforms.loc[g_platforms.name == 'Genesis', 'name'] = 'SegaMegaDrive/Genesis'
@@ -56,6 +59,7 @@ with engine.connect() as connection:
   g_platforms.loc[g_platforms.name == 'iPad', 'name'] = 'iOS'
   g_platforms.loc[g_platforms.name == 'iPod', 'name'] = 'iOS'
   g_platforms.loc[g_platforms.name == 'iPhone', 'name'] = 'iOS'
+  g_platforms.loc[g_platforms.name == 'DSiWare', 'name'] = 'NintendoDS'
 
   matching_pairs = ssj.edit_distance_join(
     g_platforms, i_platforms, 
@@ -89,8 +93,8 @@ with engine.connect() as connection:
   giantbomb_merged.loc[giantbomb_merged.ws_name == 'iPod', 'ws_name'] = 'iOS'
   giantbomb_merged.loc[giantbomb_merged.ws_name == 'iPad', 'ws_name'] = 'iOS'
   giantbomb_merged.loc[giantbomb_merged.ws_name == 'iPhone', 'ws_name'] = 'iOS'
-  
-  #TODO: better manual matching?
+  giantbomb_merged.loc[giantbomb_merged.ws_name == 'WiiWare', 'ws_name'] = "Wii"
+  giantbomb_merged.loc[giantbomb_merged.ws_name == 'DSiWare', 'ws_name'] = 'Nintendo DS'
 
   igdb_merged = matching_pairs.merge(
      i_platforms, left_on='igdb_id', right_on='id', how='outer'
