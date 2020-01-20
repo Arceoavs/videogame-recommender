@@ -23,6 +23,4 @@ EXPOSE 5000
 ENTRYPOINT [ "gunicorn", \
   "-b", "0.0.0.0:5000", \
   "--log-level", "INFO", \
-  # "--certfile", "videogames.uni-muenster.de-cert.pem", \
-  # "--keyfile", "videogames.uni-muenster.de-key-unencrypted.pem", \
   "manage:app" ]
