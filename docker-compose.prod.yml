@@ -60,7 +60,6 @@ services:
       - PYTHONDONTWRITEBYTECODE=1
     volumes:
       - ./etl:/etl:z
-    restart: always
 
   # Client is being served by netlify
   # client: 
