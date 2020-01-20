@@ -214,10 +214,7 @@ class GameRating(Resource):
                 exclude_from_model=exclude
             )
             rating.save()
-        # TODO:
-        # Implicit_instance.add(rating)
-        # Imlicit_instance.recalculate()
-        return {'message': 'Your rating was successfully saved'}, 201
+            return {'message': 'Your rating was successfully saved'}, 201
 
 
 class initializeModel(Resource):
@@ -254,7 +251,7 @@ class GameRecommendations(Resource):
     @jwt_required
     def get(self):
         if is_trained == False:
-            return {'message': 'Model is not initialized. Please do so with /initModel'}
+            return {'message': 'Model is not initialized. Please do so with /initModel'}, 503
         else:
             user_email = get_jwt_identity()
             user_id = User.find_by_username(user_email).id
