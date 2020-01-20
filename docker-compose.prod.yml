@@ -29,6 +29,7 @@ services:
       - ./etl:/etl:z
     restart: always
   web:
+    container_name: web
     build:
       context: ./web
       dockerfile: Dockerfile
@@ -37,10 +38,24 @@ services:
     environment:
       - DATABASE_URL=${DATABASE_URL}
     ports:
-      - 80:5000
+      - "5000"
     volumes:
       - ./web:/web:z
     restart: always
+  proxy:
+    image: nginx:latest
+    container_name: reverse_proxy
+    depends_on: 
+      - web
+    volumes:
+      - ./proxy/nginx.conf:/etc/nginx/nginx.conf
+      - ./proxy/error.log:/etc/nginx/error_log.log
+      - ./proxy/cache/:/etc/nginx/cache
+      - ./proxy/cert/:/etc/cert/
+      - ./proxy/ssl-key-pwd.lock/:/etc/keys/ssl-key-pwd
+    ports:
+      - 80:80
+      - 443:443
   # client: 
   #   build: 
   #     context: ./client

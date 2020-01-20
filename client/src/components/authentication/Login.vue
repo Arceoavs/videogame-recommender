@@ -52,7 +52,8 @@ export default {
     async login () {
       const username = this.email; const password = this.password
       await this.$store.dispatch('login', { username, password })
-      this.$router.push({ name: 'recommend' })
+      this.$router.push({ name: 'rate' })
+      this.$store.dispatch('retrieveUserData')
     }
   }
 }

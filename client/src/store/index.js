@@ -1,6 +1,13 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
+// Modules
+import games from './modules/games'
+import genres from './modules/genres'
+import platforms from './modules/platforms'
+import userData from './modules/user'
+import recommendations from './modules/recommendations'
+
 Vue.use(Vuex)
 
 export default new Vuex.Store({
@@ -62,6 +69,10 @@ export default new Vuex.Store({
 
     logout ({ commit }) {
       commit('logout')
+      commit('resetGenres')
+      commit('resetGames')
+      commit('resetPlatforms')
+      commit('resetUser')
       localStorage.removeItem('token')
       delete Vue.prototype.$http.defaults.headers.common['Authorization']
     }
@@ -70,6 +81,9 @@ export default new Vuex.Store({
     loggedIn: state => !!state.token,
     authStatus: state => state.status
   },
-  modules: {
-  }
+  modules: { games,
+    genres,
+    userData,
+    platforms,
+    recommendations }
 })

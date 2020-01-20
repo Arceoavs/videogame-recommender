@@ -12,6 +12,18 @@
     "loggedIn": true
   },
   {
+    "tag": "Team",
+    "to": "contact",
+    "icon": "mdi-account-group",
+    "loggedIn": true
+  },
+  {
+    "tag": "Team",
+    "to": "contact",
+    "icon": "mdi-contact",
+    "loggedIn": false
+  },
+  {
     "tag": "Register",
     "to": "register",
     "icon": "mdi-account-plus",
