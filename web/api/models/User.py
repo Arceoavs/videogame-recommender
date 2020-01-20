@@ -37,7 +37,7 @@ class User(db.Model):
 
     @classmethod
     def return_all(cls):
-        return {'users': list(map(lambda x: to_json(x), User.query.all()))}
+        return {'users': [x.to_json for x in User.query.all()]}
 
     @classmethod
     def delete_all(cls):

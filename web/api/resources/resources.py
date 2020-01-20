@@ -227,7 +227,7 @@ class GameRecommendations(Resource):
     @jwt_required
     def get(self):
         if is_trained == False:
-            return {'message': 'Model is not initialized. Please do so with /initModel'}
+            return {'message': 'Model is not initialized. Please do so with /initModel'}, 503
         else:
             user_email = get_jwt_identity()
             user_id = User.find_by_username(user_email).id

@@ -36,5 +36,5 @@ class Genre(db.Model):
     @classmethod
     def return_all(self):
         return {
-            'genres': list(map(lambda g: g.to_json_dangerously, self.query.all()))
+            'genres': [g.to_json_dangerously for g in self.query.all()]
         }

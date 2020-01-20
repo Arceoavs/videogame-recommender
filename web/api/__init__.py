@@ -1,7 +1,5 @@
 """This module initializes the whole application for use as an API server"""
 import os
-import logging
-from threading import Timer
 
 from flask import Flask, request
 from flask_cors import CORS
