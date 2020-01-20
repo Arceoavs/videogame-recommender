@@ -39,24 +39,26 @@ services:
     environment:
       - FLASK_ENV=docker
       - DATABASE_URL=${DATABASE_URL}
+      - OPENBLAS_NUM_THREADS=1
+      - PYTHONDONTWRITEBYTECODE=1
     ports:
       - 5000:5000
     volumes:
       - ./web:/web:z
     restart: always
-  client: 
-    build: 
+  client:
+    build:
       context: ./client
       dockerfile: dev.Dockerfile
-    depends_on: 
+    depends_on:
       - web
     env_file:
       - .env
-    ports: 
+    ports:
       - 8080:8080
     volumes:
-      - './client:/client:z'
-      - '/client/node_modules'
+      - "./client:/client:z"
+      - "/client/node_modules"
     restart: always
 
 volumes:

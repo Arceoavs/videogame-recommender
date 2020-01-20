@@ -1,5 +1,6 @@
 from .base import db
 
+
 class Platform(db.Model):
     __tablename__ = "platforms"
 
@@ -21,8 +22,15 @@ class Platform(db.Model):
 
     @property
     def to_json_dangerously(self):
+<<<<<<< HEAD
         q = db.session.query(Platform).filter_by(id=self.id)#.join(Game.platforms)
         #count = db.session.execute(q.statement.with_only_columns([db.func.count()]).order_by(None)).scalar()
+=======
+        q = db.session.query(Platform).filter_by(
+            id=self.id).join(Game.platforms)
+        count = db.session.execute(q.statement.with_only_columns(
+            [db.func.count()]).order_by(None)).scalar()
+>>>>>>> bc443ccf15850db1afbd251501bef13b52d115cc
         return {
             'id': self.id,
             'name': self.name,
@@ -32,5 +40,5 @@ class Platform(db.Model):
     @classmethod
     def return_all(cls):
         return {
-            'data': list(map(lambda p: p.to_json_dangerously, Platform.query.all()))
+            'platforms': [p.to_json_dangerously for p in Platform.query.all()]
         }

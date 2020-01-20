@@ -6,16 +6,21 @@ from sqlalchemy import func
 import string
 
 game_genres = db.Table('game_genres',
-  db.Column('game_id', db.Integer, db.ForeignKey('games.id'), primary_key=True),
-  db.Column('genre_id', db.Integer, db.ForeignKey('genres.id'), primary_key=True),
-  db.PrimaryKeyConstraint('game_id', 'genre_id')
-)
+                       db.Column('game_id', db.Integer, db.ForeignKey(
+                           'games.id'), primary_key=True),
+                       db.Column('genre_id', db.Integer, db.ForeignKey(
+                           'genres.id'), primary_key=True),
+                       db.PrimaryKeyConstraint('game_id', 'genre_id')
+                       )
 
 game_platforms = db.Table('game_platforms',
-  db.Column('game_id', db.Integer, db.ForeignKey('games.id'), primary_key=True),
-  db.Column('platform_id', db.Integer, db.ForeignKey('platforms.id'), primary_key=True),
-  db.PrimaryKeyConstraint('game_id', 'platform_id')
-)
+                          db.Column('game_id', db.Integer, db.ForeignKey(
+                              'games.id'), primary_key=True),
+                          db.Column('platform_id', db.Integer, db.ForeignKey(
+                              'platforms.id'), primary_key=True),
+                          db.PrimaryKeyConstraint('game_id', 'platform_id')
+                          )
+
 
     
 
@@ -25,6 +30,7 @@ class Game(db.Model):
     title = db.Column(db.String, nullable=False)
     description = db.Column(db.String)
     year = db.Column(db.Integer)
+    image_url = db.Column(db.String)
     genres = db.relationship(
         'Genre',
         secondary=game_genres,
@@ -37,13 +43,14 @@ class Game(db.Model):
         lazy='subquery',
         backref=db.backref('platforms', lazy=True, cascade='all, delete')
         )
+    ratings = db.relationship('Rating', backref='game')
 
     def __init__(self, title: str):
         self.title = title
 
     def __repr__(self):
         return f'<Game {self.title}>'
-    
+
     @property
     def to_json(self):
         genres = []
@@ -52,13 +59,19 @@ class Game(db.Model):
         platforms = []
         for platform in self.platforms:
             platforms.append(platform.to_json)
+        filtered_ratings = [x for x in self.ratings if not x.exclude_from_model]
+        ratings_sum = sum(map(lambda rating: rating.value, filtered_ratings))
+        ratings_len = len(filtered_ratings)
         return {
             'id': self.id,
             'title': self.title,
             'description': self.description,
             'year': self.year,
+            'image_url': self.image_url,
             'genres': genres,
-            'platforms': platforms
+            'platforms': platforms,
+            'ratings_count': ratings_len,
+            'avarage_rating': None if ratings_len == 0 else round(ratings_sum / ratings_len, 2),
         }
         
     @classmethod
@@ -127,3 +140,17 @@ class Game(db.Model):
                       .offset(offset)\
                       .limit(limit)
         return {'games': [g.to_json for g in _query.all()]}
+    def return_recommendations(self, game_ids):
+        results = self.query.filter(self.id.in_(game_ids)).all()
+        sorted_results = sorted(results, key = lambda x: game_ids.index(x.id))
+        return {'recommendations': [g.to_json for g in sorted_results]}
+
+    @classmethod
+    def return_by_id(self, id):
+        game = self.query.filter_by(id=id).first()
+        if game is None:
+            return {'game': None}
+        else:
+            game = game.to_json
+            game['user_rating'] = None  # TODO: Show user rating
+            return {'game': game}
