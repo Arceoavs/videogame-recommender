@@ -157,8 +157,13 @@ with engine.connect() as connection:
   keepDuplicate = merged_lookup[merged_lookup.duplicated(['name'],keep='first')]
   duplicateRows = merged_lookup[merged_lookup.duplicated(['name'],keep='last')]
   
-  for dup, id in zip(duplicateRows['id'], keepDuplicate['id']):
-    merged_lookup.loc[merged_lookup.id == dup, 'id'] = id
+  duplicateRows = merged_lookup[merged_lookup.duplicated(['name'],keep=False)]
+
+  lastName = ''
+  for id, name in zip(duplicateRows['id'], duplicateRows['name']):
+    if name == lastName:
+      merged_lookup.loc[merged_lookup.name == name, 'id'] = id
+    lastName = name
 
   merged_lookup.loc[merged_lookup.metacritic_name == 'NintendoDS', 'metacritic_name'] = 'DS'
   merged_lookup.loc[merged_lookup.metacritic_name == 'Nintendo3DS', 'metacritic_name'] = '3DS'
@@ -180,14 +185,12 @@ with engine.connect() as connection:
 
   connection.execute(
     """
-    DROP TABLE IF EXISTS platforms;
-    CREATE TABLE platforms (
-      id int NOT NULL,
-      name varchar(255)
-    );
+    DELETE FROM game_platforms;
+    DELETE FROM platforms;
     INSERT INTO platforms
-    SELECT id, name
-    FROM lookup.platforms;
+    SELECT distinct(id), name 
+    FROM lookup.platforms 
+    ORDER BY id;
     """
   )
 
