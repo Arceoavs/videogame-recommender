@@ -1,6 +1,9 @@
+[![Netlify Status](https://api.netlify.com/api/v1/badges/9b4ce271-4d2e-43d0-b2b4-099d612d2479/deploy-status)](https://app.netlify.com/sites/videogames-muenster/deploys)
 # Video Game Recommender
 
-University project for a video game recommender system
+A recommender system for video games! The Video Game Recommender (VGR) project was created as an university project at the Westfälische Wilhelms-Universität Münster, as part of the Data Integartion Module in the Information Systems master programme.
+
+You can access the video game recommender at http://vgr.best! Because we have a vision to create the best video game recommender there is!
 
 ## Project Setup
 
@@ -15,7 +18,6 @@ This will take some time. For the next time, just enter
 ```
 $ docker-compose up
 ```
-
 to start all services and `docker-compose down` to stop them. You need to run `docker-compose build` only again if you add changes for the container, e.g. install a new python library via pip in the container. The following services are started.
 
 **Postgres Database**
@@ -49,10 +51,23 @@ If you want to run only a python script, just use:
 ```
 $ docker-compose exec etl python transformations/load_metacritic_games.py
 ```
-
 **Flask Web API**
 
 Flask listens on port 5000. You can access the web application on [localhost:5000](http://localhost:5000) by default.
+
+## Project Deployment
+To deploy the backend to the university server, first establish a SSH connection via the connection string `ssh videogames@videogames.uni-muenster.de -p 2222` using the password `#ioHom#qA!ZLmLo`. 
+Please note, that connecting via SSH on port 2222 is only possible either from within the university network or a vpn connection to the university.
+
+Next, stop all running containers with `docker-compose stop` from within the `~/videogames` directory and pull the latest code from the master branch via `git pull`. 
+
+By executing the command 
+```
+sudo docker-compose -f docker-compose.prod.yml up --build -d
+```
+The new backend will be re-deployed and available on http://videogames.uni-muenster.de on the standard http port 80.
+
+Yout might want to execute sudo docker-compose `sudo docker-compose exec web python manage.py db init` and `sudo docker-compose exec web python manage.py db migrate` when running into database errors. 
 
 ## Datasets
 
