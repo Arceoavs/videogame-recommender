@@ -52,6 +52,7 @@ services:
       - ./proxy/error.log:/etc/nginx/error_log.log
       - ./proxy/cache/:/etc/nginx/cache
       - ./proxy/cert/:/etc/cert/
+      - ./proxy/ssl-key-pwd.lock/:/etc/keys/ssl-key-pwd
     ports:
       - 80:80
       - 443:443
