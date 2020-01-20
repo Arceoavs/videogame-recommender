@@ -17,6 +17,12 @@ api.log
 test.db
 creds.ini
 
+# client specific
+node_modules
+
+# proxy specific
+proxy/cache
+
 # outdated database mounts
 .pgdatabase
 pgdatabase
