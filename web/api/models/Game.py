@@ -22,10 +22,9 @@ game_platforms = db.Table('game_platforms',
                           )
 
 
-    
-
 class Game(db.Model):
     __tablename__ = 'games'
+
     id = db.Column(db.Integer, unique=True, primary_key=True)
     title = db.Column(db.String, nullable=False)
     description = db.Column(db.String)

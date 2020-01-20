@@ -51,7 +51,7 @@ export default {
   methods: {
     async register () {
       const username = this.email; const password = this.password
-      this.$store.dispatch('register', { username, password })
+      await this.$store.dispatch('register', { username, password })
       this.$router.push({ name: 'recommend' })
     }
   }

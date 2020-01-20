@@ -13,10 +13,43 @@ services:
     volumes:
       - postgresdb:/var/lib/postgresql/data:z
     restart: always
+
+  web:
+    container_name: web
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    depends_on:
+      - postgres
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+    ports:
+      - "5000"
+    volumes:
+      - ./web:/web:z
+    restart: always
+
+  proxy:
+    image: nginx:latest
+    container_name: reverse_proxy
+    depends_on: 
+      - web
+    volumes:
+      - ./proxy/nginx.conf:/etc/nginx/nginx.conf
+      - ./proxy/error.log:/etc/nginx/error_log.log
+      - ./proxy/cache/:/etc/nginx/cache
+      - ./proxy/cert/:/etc/cert/
+      - ./proxy/ssl-key-pwd.lock/:/etc/keys/ssl-key-pwd
+    ports:
+      - 80:80
+      - 443:443
+
   etl:
     build:
       context: ./etl
+      dockerfile: Dockerfile
     depends_on:
+      - web
       - postgres
     environment:
       - POSTGRES_HOST=${POSTGRES_HOST}
@@ -27,20 +60,8 @@ services:
       - PYTHONDONTWRITEBYTECODE=1
     volumes:
       - ./etl:/etl:z
-    restart: always
-  web:
-    build:
-      context: ./web
-      dockerfile: Dockerfile
-    depends_on:
-      - postgres
-    environment:
-      - DATABASE_URL=${DATABASE_URL}
-    ports:
-      - 80:5000
-    volumes:
-      - ./web:/web:z
-    restart: always
+
+  # Client is being served by netlify
   # client: 
   #   build: 
   #     context: ./client

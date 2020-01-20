@@ -41,10 +41,10 @@ v-img(:aspect-ratio="4/3"
             p.font-weight-light.text-justify
               | Welcome to the Video Game Recommender.
               | We use a data-driven approach to deliver you the best recommendations possible.
-            p.font-weight-light.text-justify
-              | Our mission is to keep you playing forever.
-              | This is your life now.
-              | Enjoy.
+            VueTypedJs(:strings="['Our mission is to keep you playing forever.', \
+              'This is your life now.', \
+              'Enjoy.']")
+              span.font-weight-light.text-justify.typing
 
         Register(v-if="showRegister")
         Login(v-else)
@@ -53,10 +53,11 @@ v-img(:aspect-ratio="4/3"
 <script>
 import Login from '@/components/authentication/Login'
 import Register from '@/components/authentication/Register'
+import { VueTypedJs } from 'vue-typed-js'
 
 export default {
   name: 'Landing',
-  components: { Login, Register },
+  components: { Login, Register, VueTypedJs },
   props: {
     showLogin: { type: Boolean, default: false },
     showRegister: { type: Boolean, default: false }

@@ -36,6 +36,7 @@ class Index(Resource):
             'greeting': 'Hello videogamer'
         }
 
+
 class UserRegistration(Resource):
     def post(self):
         data = AUTH_PARSER.parse_args()
@@ -137,9 +138,6 @@ class CurrentUser(Resource):
 GAME_PARSER = reqparse.RequestParser()
 GAME_PARSER.add_argument('offset', type=int)
 GAME_PARSER.add_argument('limit', type=int)
-GAME_PARSER.add_argument('genres')
-GAME_PARSER.add_argument('platforms')
-GAME_PARSER.add_argument('search')
 
 
 class AllGames(Resource):
@@ -147,24 +145,6 @@ class AllGames(Resource):
         args = GAME_PARSER.parse_args()
         offset = 0 if args.offset is None else args.offset
         limit = 100 if args.limit is None else args.limit
-        genres = args.genres
-        if args.search is not None:
-            if args.genres is not None:
-                if args.platforms is not None:
-                    return Game.return_searchtitle_platform_genre(offset,limit,args.search,args.platforms.split(","), genres.split(","))
-                else:
-                    return Game.return_searchtitle_genre(offset,limit,args.search, genres.split(","))
-            else:
-                if args.platforms is not None:
-                    return Game.return_searchtitle_platform(offset,limit,args.search,args.platforms.split(","))
-                else:
-                    return Game.return_searchtitle(offset, limit, args.search)
-        if args.platforms is not None:
-            return Game.return_byplatform(offset,limit,args.platforms.split(","))
-        if args.genres is None:
-            search = args.search
-        else:
-            return Game.return_bygenres(offset, limit, genres.split(",")) 
         return Game.return_all(offset, limit)
 
 
