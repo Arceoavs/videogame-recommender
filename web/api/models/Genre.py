@@ -23,14 +23,8 @@ class Genre(db.Model):
     @property
     def to_json_dangerously(self):
         # https://gist.github.com/hest/8798884
-<<<<<<< HEAD
         q = db.session.query(Genre).filter_by(id=self.id)#.join(Game.genres) #.filter(genre_id == self.id) #.filter(Games.id==1).count() filter(games = self.id)
         #count = db.session.execute(q.statement.with_only_columns([db.func.count()]).order_by(None)).scalar()
-=======
-        q = db.session.query(Genre).filter_by(id=self.id).join(Game.genres)
-        count = db.session.execute(q.statement.with_only_columns(
-            [db.func.count()]).order_by(None)).scalar()
->>>>>>> bc443ccf15850db1afbd251501bef13b52d115cc
         return {
             'id': self.id,
             'name': self.name,
