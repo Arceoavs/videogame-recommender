@@ -13,21 +13,7 @@ services:
     volumes:
       - postgresdb:/var/lib/postgresql/data:z
     restart: always
-  etl:
-    build:
-      context: ./etl
-    depends_on:
-      - postgres
-    environment:
-      - POSTGRES_HOST=${POSTGRES_HOST}
-      - POSTGRES_PORT=${POSTGRES_PORT}
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
-      - PYTHONDONTWRITEBYTECODE=1
-    volumes:
-      - ./etl:/etl:z
-    restart: always
+
   web:
     container_name: web
     build:
@@ -42,6 +28,7 @@ services:
     volumes:
       - ./web:/web:z
     restart: always
+
   proxy:
     image: nginx:latest
     container_name: reverse_proxy
@@ -56,6 +43,26 @@ services:
     ports:
       - 80:80
       - 443:443
+
+  etl:
+    build:
+      context: ./etl
+      dockerfile: Dockerfile
+    depends_on:
+      - web
+      - postgres
+    environment:
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - PYTHONDONTWRITEBYTECODE=1
+    volumes:
+      - ./etl:/etl:z
+    restart: always
+
+  # Client is being served by netlify
   # client: 
   #   build: 
   #     context: ./client

@@ -13,9 +13,11 @@ services:
     volumes:
       - postgresdb:/var/lib/postgresql/data:z
     restart: always
+
   etl:
     build:
       context: ./etl
+      dockerfile: dev.Dockerfile
     depends_on:
       - postgres
     environment:
@@ -25,9 +27,12 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
       - PYTHONDONTWRITEBYTECODE=1
+    command: 
+      - ["tail", "-f", "/dev/null"] # run forever
     volumes:
       - ./etl:/etl:z
     restart: always
+    
   web:
     build:
       context: ./web
@@ -46,21 +51,22 @@ services:
     volumes:
       - ./web:/web:z
     restart: always
-  client:
-    build:
-      context: ./client
-      dockerfile: dev.Dockerfile
-    depends_on:
-      - web
-    env_file:
-      - .env
-    ports:
-      - 8080:8080
-    command: ["npm", "run", "serve", "--quiet", "--no-progress"]
-    volumes:
-      - "./client:/client:z"
-      - "/client/node_modules"
-    restart: always
+
+  # client:
+  #   build:
+  #     context: ./client
+  #     dockerfile: dev.Dockerfile
+  #   depends_on:
+  #     - web
+  #   env_file:
+  #     - .env
+  #   ports:
+  #     - 8080:8080
+  #   command: ["npm", "run", "serve", "--quiet", "--no-progress"]
+  #   volumes:
+  #     - "./client:/client:z"
+  #     - "/client/node_modules"
+  #   restart: always
 
 volumes:
   postgresdb:
