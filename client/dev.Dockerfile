@@ -9,8 +9,5 @@ ENV PATH /client/node_modules/.bin:$PATH
 
 # install and cache client dependencies
 COPY package.json /client/package.json
-RUN npm install
+RUN npm install --quiet
 RUN npm install @vue/cli@3.7.0 -g
-
-# start client
-CMD ["npm", "run", "serve"]

@@ -1,5 +1,6 @@
 # Editor specific
 .vscode
+node_modules
 
 # macOS specific
 .DS_Store
@@ -16,6 +17,12 @@ migrations/
 api.log
 test.db
 creds.ini
+
+# client specific
+node_modules
+
+# proxy specific
+proxy/cache
 
 # outdated database mounts
 .pgdatabase

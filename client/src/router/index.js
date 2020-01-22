@@ -45,8 +45,8 @@ const routes = [
     name: 'rate',
     meta: {
       requiresAuth: true
-    }
-    // component: () => import(/* webpackChunkName: "about" */ '../views/Recommend.vue')
+    },
+    component: () => import(/* webpackChunkName: "rate" */ '../views/Rate.vue')
   },
   {
     path: '/logout',
@@ -60,8 +60,47 @@ const routes = [
     }
   },
   {
+    path: '/contact',
+    name: 'contact',
+    meta: {
+      requiresAuth: false
+    },
+    component: () =>
+      import(/* webpackChunkName: "contact" */ '@/views/Contact.vue')
+  },
+  {
+    path: '/terms',
+    name: 'terms',
+    meta: {
+      requiresAuth: false
+    },
+    component: () =>
+      import(/* webpackChunkName: "terms" */ '@/views/Terms.vue')
+  },
+  {
+    path: '/privacy',
+    name: 'privacy',
+    meta: {
+      requiresAuth: false
+    },
+    component: () =>
+      import(/* webpackChunkName: "privacy" */ '@/views/Privacy.vue')
+  },
+  {
+    path: '/imprint',
+    name: 'imprint',
+    meta: {
+      requiresAuth: false
+    },
+    component: () =>
+      import(/* webpackChunkName: "imprint" */ '@/views/Imprint.vue')
+  },
+  {
     path: '/*',
     name: '404',
+    meta: {
+      requiresAuth: false
+    },
     component: () =>
       import(/* webpackChunkName: "error" */ '@/views/errors/404.vue')
   }
@@ -76,6 +115,7 @@ const router = new VueRouter({
 router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
     if (store.getters.loggedIn) {
+      store.dispatch('retrieveUserData')
       next()
       return
     }
