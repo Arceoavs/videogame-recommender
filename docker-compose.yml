@@ -27,11 +27,8 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
       - PYTHONDONTWRITEBYTECODE=1
-    command: 
-      - ["tail", "-f", "/dev/null"] # run forever
     volumes:
       - ./etl:/etl:z
-    restart: always
     
   web:
     build:
