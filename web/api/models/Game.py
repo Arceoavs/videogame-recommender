@@ -139,6 +139,8 @@ class Game(db.Model):
                       .offset(offset)\
                       .limit(limit)
         return {'games': [g.to_json for g in _query.all()]}
+
+    @classmethod
     def return_recommendations(self, game_ids):
         results = self.query.filter(self.id.in_(game_ids)).all()
         sorted_results = sorted(results, key = lambda x: game_ids.index(x.id))
