@@ -3,9 +3,9 @@ import pandas as pd
 def select_metacritic_ratings(connection):
   return pd.read_sql_query(
     '''
-    SELECT u.id        AS user_id,
-           g.id        AS game_id,
-           r.userscore AS "value"
+    SELECT DISTINCT u.id        AS user_id,
+                    g.id        AS game_id,
+                    r.userscore AS "value"
     FROM   metacritic.stage_user_comments r
            INNER JOIN (SELECT id,
                               Split_part(username, '@metacritic.user', 1) AS
