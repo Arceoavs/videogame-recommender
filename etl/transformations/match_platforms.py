@@ -32,6 +32,10 @@ with engine.connect() as connection:
     connection
   )
 
+  # Drop those platforms that are shops instead of 'real' platforms
+  i_platforms = i_platforms[i_platforms.name != 'Nintendo eShop']
+  g_platforms = g_platforms[g_platforms.name != 'Wii Shop']
+
   ### Matching
 
   g_platforms['ws_name'] = g_platforms['name']
@@ -41,13 +45,21 @@ with engine.connect() as connection:
 
   i_platforms.loc[i_platforms.name == 'NintendoGameCube', 'name'] = 'GameCube'
   i_platforms.loc[i_platforms.name == 'CommodorePET', 'name'] = 'CommodorePET/CBM'
-  i_platforms.loc[i_platforms.name == 'PCDOS', 'name'] = 'PC' #multiple matches, drop_duplicates necessary!
+  i_platforms.loc[i_platforms.name == 'PCDOS', 'name'] = 'PC' 
+  i_platforms.loc[i_platforms.name == 'WiiWare', 'name'] = "Wii"
   g_platforms.loc[g_platforms.name == 'Commodore64', 'name'] = 'CommodoreC64/128'
   g_platforms.loc[g_platforms.name == 'Commodore128', 'name'] = 'CommodoreC64/128'
   g_platforms.loc[g_platforms.name == 'Genesis', 'name'] = 'SegaMegaDrive/Genesis'
+  g_platforms.loc[g_platforms.name == 'Saturn', 'name'] = 'SegaSaturn'
+  g_platforms.loc[g_platforms.name == 'Nintendo3DSeShop', 'name'] = 'Nintendo3DS'
+  g_platforms.loc[g_platforms.name == 'NintendoeShop', 'name'] = 'Nintendo'
   g_platforms.loc[g_platforms.name == 'Jaguar', 'name'] = 'AtariJaguar'
   g_platforms.loc[g_platforms.name == 'TurboGrafx-CD', 'name'] = 'Turbografx-16/PCEngineCD'
   g_platforms.loc[g_platforms.name == 'TurboGrafx-16', 'name'] = 'TurboGrafx-16/PCEngine'
+  g_platforms.loc[g_platforms.name == 'iPad', 'name'] = 'iOS'
+  g_platforms.loc[g_platforms.name == 'iPod', 'name'] = 'iOS'
+  g_platforms.loc[g_platforms.name == 'iPhone', 'name'] = 'iOS'
+  g_platforms.loc[g_platforms.name == 'DSiWare', 'name'] = 'NintendoDS'
 
   matching_pairs = ssj.edit_distance_join(
     g_platforms, i_platforms, 
@@ -72,11 +84,17 @@ with engine.connect() as connection:
   giantbomb_merged.loc[giantbomb_merged.ws_name == 'Commodore 64', 'ws_name'] = 'Commodore C64/128'
   giantbomb_merged.loc[giantbomb_merged.ws_name == 'Commodore 128', 'ws_name'] = 'Commodore C64/128'
   giantbomb_merged.loc[giantbomb_merged.ws_name == 'Genesis', 'ws_name'] = 'Sega Mega Drive/Genesis'
+  giantbomb_merged.loc[giantbomb_merged.ws_name == 'Saturn', 'ws_name'] = 'Sega Saturn'
   giantbomb_merged.loc[giantbomb_merged.ws_name == 'Jaguar', 'ws_name'] = 'Atari Jaguar'
+  giantbomb_merged.loc[giantbomb_merged.ws_name == 'Nintendo 3DS eShop', 'ws_name'] = 'Nintendo 3DS'
+  giantbomb_merged.loc[giantbomb_merged.ws_name == 'Nintendo eShop', 'ws_name'] = 'Nintendo'
   giantbomb_merged.loc[giantbomb_merged.ws_name == 'TurboGrafx-CD', 'ws_name'] = 'Turbografx-16/PC Engine CD'
   giantbomb_merged.loc[giantbomb_merged.ws_name == 'TurboGrafx-16', 'ws_name'] = 'Turbografx-16/PC Engine'
-  #TODO: better manual matching?
-
+  giantbomb_merged.loc[giantbomb_merged.ws_name == 'iPod', 'ws_name'] = 'iOS'
+  giantbomb_merged.loc[giantbomb_merged.ws_name == 'iPad', 'ws_name'] = 'iOS'
+  giantbomb_merged.loc[giantbomb_merged.ws_name == 'iPhone', 'ws_name'] = 'iOS'
+  giantbomb_merged.loc[giantbomb_merged.ws_name == 'WiiWare', 'ws_name'] = "Wii"
+  giantbomb_merged.loc[giantbomb_merged.ws_name == 'DSiWare', 'ws_name'] = 'Nintendo DS'
 
   igdb_merged = matching_pairs.merge(
      i_platforms, left_on='igdb_id', right_on='id', how='outer'
@@ -135,6 +153,18 @@ with engine.connect() as connection:
   merged_lookup = merged_lookup[['id_x', 'ws_name', 'igdb_id_x', 'giantbomb_id', 'metacritic_name']]
   merged_lookup = merged_lookup.rename({'id_x': 'id', 'ws_name' : 'name', 'igdb_id_x': 'igdb_id'}, axis=1)
   merged_lookup = merged_lookup.drop_duplicates()
+
+  keepDuplicate = merged_lookup[merged_lookup.duplicated(['name'],keep='first')]
+  duplicateRows = merged_lookup[merged_lookup.duplicated(['name'],keep='last')]
+  
+  duplicateRows = merged_lookup[merged_lookup.duplicated(['name'],keep=False)]
+
+  lastName = ''
+  for id, name in zip(duplicateRows['id'], duplicateRows['name']):
+    if name == lastName:
+      merged_lookup.loc[merged_lookup.name == name, 'id'] = id
+    lastName = name
+
   merged_lookup.loc[merged_lookup.metacritic_name == 'NintendoDS', 'metacritic_name'] = 'DS'
   merged_lookup.loc[merged_lookup.metacritic_name == 'Nintendo3DS', 'metacritic_name'] = '3DS'
   merged_lookup.loc[merged_lookup.metacritic_name == 'PlayStationPortable', 'metacritic_name'] = 'PSP'
@@ -158,8 +188,9 @@ with engine.connect() as connection:
     DELETE FROM game_platforms;
     DELETE FROM platforms;
     INSERT INTO platforms
-    SELECT id, name
-    FROM lookup.platforms;
+    SELECT distinct(id), name 
+    FROM lookup.platforms 
+    ORDER BY id;
     """
   )
 
