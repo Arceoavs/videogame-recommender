@@ -4,36 +4,57 @@
     v-col
       h2.display-1 Register
 
-  v-row(justify="start")
-    v-col
-      v-text-field(v-model="email"
-        color="primary"
-        prepend-inner-icon="mdi-email"
-        label="E-Mail"
-        hide-details)
+  v-form#RegisterForm(v-model="valid")
+    v-row(justify="start"
+      no-gutters)
+      v-col
+        v-text-field(outlined
+          v-model="email"
+          color="primary"
+          prepend-inner-icon="mdi-email"
+          label="E-Mail"
+          :rules="[rules.required, rules.email]")
 
-  v-row(justify="start")
-    v-col
-      v-text-field(color="primary"
-        prepend-inner-icon="mdi-lock"
-        label="Password"
-        v-model="password"
-        :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-        :rules="[rules.required, rules.min]"
-        :type="showPassword ? 'text' : 'password'"
-        counter
-        @click:append="show = !show")
+    v-row(justify="start"
+      no-gutters)
+      v-col
+        v-text-field(outlined
+          color="primary"
+          prepend-inner-icon="mdi-lock"
+          label="Password"
+          v-model="password"
+          :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+          :rules="[rules.required, rules.min]"
+          :type="showPassword ? 'text' : 'password'"
+          counter
+          @click:append="show = !show")
 
-  v-row(justify="start")
-    v-col(align="end")
-      v-btn.mr-4(:to="{name: 'login'}")
-        | To Login
-      v-btn.black--text(@click="register"
-        color="primary")
-        | Register
+    v-row(justify="start"
+      no-gutters)
+      v-col
+        v-text-field(outlined
+          color="primary"
+          prepend-inner-icon="mdi-lock"
+          label="Confirm Password"
+          v-model="passwordConfirmation"
+          :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+          :rules="[rules.required, rules.min, rules.passwordMatch(password, passwordConfirmation)]"
+          :type="showPassword ? 'text' : 'password'"
+          @click:append="show = !show")
+
+    v-row(justify="start")
+      v-col(align="end")
+        v-btn.mr-4(:to="{name: 'login'}")
+          | To Login
+        v-btn.black--text(:disabled="!valid"
+          @click="register"
+          color="primary")
+          | Register
 </template>
 
 <script>
+import RuleCollection from './rules'
+
 export default {
   name: 'Login',
   data () {
@@ -42,10 +63,8 @@ export default {
       password: '',
       passwordConfirmation: '',
       showPassword: false,
-      rules: {
-        required: value => !!value || 'Required.',
-        min: v => v.length >= 8 || 'Min 8 characters'
-      }
+      valid: false,
+      rules: RuleCollection
     }
   },
   methods: {
