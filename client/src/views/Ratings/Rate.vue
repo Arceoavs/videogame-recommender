@@ -81,19 +81,25 @@
             v-icon mdi-chevron-right
 
     #existingRatings
-      v-row.mt-2(justify="center" align="start")
-        v-col(cols="12")
+      v-row.mt-2(justify="center" align="center")
+        v-col(cols="12" sm="6"
+          align="center")
           h2.display-1 Your ratings
-
-      v-row(no-gutters)
-        v-col(cols="6")
-          p.font-weight-light.title
-            | The more games you rate, the better the recommendations get!
-          v-btn(outlined
+          v-btn.mt-3(outlined
             color="primary"
             :to="{name: 'existingRatings'}")
             v-icon.mr-2 mdi-star
             | Show rated games
+
+        v-col(cols="12" sm="6"
+          align="center")
+          h2.display-1 Excluded games
+          v-btn.mt-3(outlined
+            color="primary"
+            :to="{name: 'excludedRatings'}")
+            v-icon.mr-2 mdi-close
+            | Show excluded games
+
 </template>
 
 <script>

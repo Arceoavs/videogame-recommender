@@ -57,6 +57,14 @@ const routes = [
     component: () => import(/* webpackChunkName: "rate" */ '../views/Ratings/ExistingsRatings.vue')
   },
   {
+    path: '/excluded-ratings',
+    name: 'excludedRatings',
+    meta: {
+      requiresAuth: true
+    },
+    component: () => import(/* webpackChunkName: "rate" */ '../views/Ratings/ExcludedRatings.vue')
+  },
+  {
     path: '/logout',
     name: 'logout',
     meta: {

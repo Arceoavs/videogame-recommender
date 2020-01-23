@@ -55,6 +55,8 @@ export default {
       rootState.userData.userData.ratings.forEach(async rating => {
         try {
           const res = await Vue.prototype.$http.get('/games/' + rating.game_id)
+          res.data.game.user_rating = rating.value
+          res.data.game.excluded = rating.exlude_from_model
           ratedGames.push(res.data.game)
         } catch (err) {
           commit('authError', err.message)
@@ -73,6 +75,7 @@ export default {
       return { max: Math.max(...state.games.map(o => o.id), 0),
         min: Math.min(...state.games.map(o => o.id), Number.MAX_SAFE_INTEGER) }
     },
-    ratedGames: state => state.ratedGames
+    ratedGames: state => state.ratedGames.filter(g => !g.excluded),
+    excludedGames: state => state.ratedGames.filter(g => g.excluded)
   }
 }
