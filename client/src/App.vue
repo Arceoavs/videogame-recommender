@@ -12,7 +12,7 @@ v-app(:style="{background: $vuetify.theme.themes[theme].background}")
 
 import Navbar from '@/components/navigation/Navbar'
 import Drawer from '@/components/navigation/Drawer'
-import Footer from '@/components/Footer'
+import Footer from '@/components/navigation/Footer'
 import Confirmation from '@/components/authentication/SnackMessage'
 
 export default {
