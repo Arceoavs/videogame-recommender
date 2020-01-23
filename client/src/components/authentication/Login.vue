@@ -5,7 +5,8 @@
       h2.display-1 Login
 
   v-form(v-model="valid")
-    v-row(justify="start")
+    v-row(justify="start"
+      no-gutters)
       v-col
         v-text-field(outlined
           v-model="email"
@@ -14,7 +15,8 @@
           :rules="[rules.required, rules.email]",
           label="E-Mail")
 
-    v-row(justify="start")
+    v-row(justify="start"
+      no-gutters)
       v-col
         v-text-field(outlined
           color="primary"
