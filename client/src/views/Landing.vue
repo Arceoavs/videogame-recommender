@@ -1,7 +1,7 @@
 <template lang="pug">
-v-img(:aspect-ratio="4/3"
-  src="../assets/background.jpg"
-  gradient="0.25turn, rgba(0,0,0,1) 40%, rgba(0,0,0,0)")
+v-img(src="../assets/background.jpg"
+  gradient="0.25turn, rgba(0,0,0,1) 40%, rgba(0,0,0,0)"
+  height="100%")
   v-container
     v-row
       v-col(sm="6" cols="10")
