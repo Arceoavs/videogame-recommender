@@ -46,7 +46,15 @@ const routes = [
     meta: {
       requiresAuth: true
     },
-    component: () => import(/* webpackChunkName: "rate" */ '../views/Rate.vue')
+    component: () => import(/* webpackChunkName: "rate" */ '../views/Ratings/Rate.vue')
+  },
+  {
+    path: '/your-ratings',
+    name: 'existingRatings',
+    meta: {
+      requiresAuth: true
+    },
+    component: () => import(/* webpackChunkName: "rate" */ '../views/Ratings/ExistingsRatings.vue')
   },
   {
     path: '/logout',

@@ -28,7 +28,7 @@
             prepend-inner-icon="mdi-magnify"
             placeholder="Search for games")
 
-        v-col(cols="5" lg="3" md="3" sm="5")
+        v-col(cols="12" lg="3" md="3" sm="5")
           v-autocomplete(outlined
             dense
             prepend-inner-icon="mdi-gamepad-variant-outline"
@@ -41,7 +41,7 @@
             multiple
             placeholder="Filter platforms")
 
-        v-col(cols="5" lg="3" md="3" sm="5")
+        v-col(cols="12" lg="3" md="3" sm="5")
           v-autocomplete(outlined
             dense
             prepend-inner-icon="mdi-format-list-text"
@@ -54,43 +54,22 @@
             multiple
             placeholder="Filter genres")
 
-      v-row(justify="start" align="center")
-        v-col(cols="12")
-          Swiper(ref="swiperNewRatings"
-            @reachEnd="$store.dispatch('loadNext')"
-            @reachBeginning="$store.dispatch('loadPrev')"
-            :slidesPerView="3"
-            :spaceBetween="30"
-            :games="sortedGames"
-            :rated="rerenderSwiper")
-
-      v-row(justify="start" align="center")
-        v-col(align="center")
-          v-icon mdi-chevron-left
-        v-col(align="center")
-          p.font-weight-light.font-italic
-            | Swipe left and right
-        v-col(align="center")
-          v-icon mdi-chevron-right
-
-    #existingRatings
-      v-row.mt-2(justify="center" align="start")
-        v-col(cols="12")
-          h2.display-1 Your ratings
-
-      v-row(no-gutters)
+      v-row(justify="start" align="center"
+        v-if="!gamesLoaded")
         v-col
-          p.font-weight-light.title
-            | The more games you rate, the better the recommendations get!
+          v-progress-linear(indeterminate
+            color="primary")
 
-      #existingRatings(v-if="ratings && ratings.length")
+      #gamesLoaded(v-else)
         v-row(justify="start" align="center")
           v-col(cols="12")
-            Swiper(ref="swiperOldRatings"
+            Swiper(ref="swiperNewRatings"
+              @reachEnd="$store.dispatch('loadNext')"
+              @reachBeginning="$store.dispatch('loadPrev')"
               :slidesPerView="3"
               :spaceBetween="30"
-              :games="ratedGames"
-              :key="swiperKey")
+              :games="sortedGames"
+              :rated="rerenderSwiper")
 
         v-row(justify="start" align="center")
           v-col(align="center")
@@ -101,11 +80,20 @@
           v-col(align="center")
             v-icon mdi-chevron-right
 
-      #noExistingRatings(v-else)
-        v-row(justify="start" align="center")
-          v-col
-            p.font-weight-light
-              | You have not yet rated any games.
+    #existingRatings
+      v-row.mt-2(justify="center" align="start")
+        v-col(cols="12")
+          h2.display-1 Your ratings
+
+      v-row(no-gutters)
+        v-col(cols="6")
+          p.font-weight-light.title
+            | The more games you rate, the better the recommendations get!
+          v-btn(outlined
+            color="primary"
+            :to="{name: 'existingRatings'}")
+            v-icon.mr-2 mdi-star
+            | Show rated games
 </template>
 
 <script>
@@ -122,15 +110,14 @@ export default {
   data () {
     return {
       selectedGenres: [],
-      selectedPlatforms: [],
-      swiperKey: 0
+      selectedPlatforms: []
     }
   },
   computed: {
     ...mapGetters(['sortedGames',
       'range',
       'genres',
-      'ratedGames',
+      'gamesLoaded',
       'ratings',
       'platforms',
       'neededRatingsAmount',

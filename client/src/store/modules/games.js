@@ -65,6 +65,9 @@ export default {
   },
   getters: {
     games: state => state.games,
+    gamesLoaded: state => state.games
+      ? !!state.games.length
+      : false,
     sortedGames: state => state.games.sort((a, b) => a.id - b.id),
     range: state => {
       return { max: Math.max(...state.games.map(o => o.id), 0),

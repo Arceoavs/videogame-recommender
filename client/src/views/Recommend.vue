@@ -18,7 +18,8 @@ v-img(:aspect-ratio="4/3"
               | The games you might want to try
           v-col(cols="6" sm="4" align="end")
             v-btn(@click="reretrieve"
-              color="primary")
+              color="primary"
+              outlined)
               v-icon.mr-2 mdi-refresh
               | Refresh
 
