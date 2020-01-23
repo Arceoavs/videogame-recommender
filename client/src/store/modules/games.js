@@ -11,7 +11,6 @@ function buildArgsString (args) {
   if (args.platforms && args.platforms.length) {
     url += 'platforms=' + args.platforms + '&'
   }
-  console.log(url)
   return url
 }
 
@@ -81,7 +80,6 @@ export default {
       dispatch('retrieveGames')
     },
     async retrieveGames ({ commit, state }) {
-      console.log(state.args)
       try {
         const res = await Vue.prototype.$http.get(
           buildArgsString(state.args))
