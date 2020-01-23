@@ -2,10 +2,12 @@
 v-row#GameFilters.mt-2(justify="space-between" align="center" no-gutters)
   v-col(cols="12" lg="3" md="3")
     v-text-field(outlined
+      v-model="search"
       dense
       clearable
       prepend-inner-icon="mdi-magnify"
-      placeholder="Search for games")
+      placeholder="Search for games"
+      @change="filterSearch")
 
   v-col(cols="12" lg="3" md="3" sm="5")
     v-autocomplete(outlined
@@ -32,6 +34,7 @@ v-row#GameFilters.mt-2(justify="space-between" align="center" no-gutters)
       chips
       small-chips
       multiple
+      @change="filterGenres"
       placeholder="Filter genres")
 </template>
 
@@ -41,6 +44,7 @@ export default {
   name: 'GameFilter',
   data () {
     return {
+      search: '',
       selectedGenres: [],
       selectedPlatforms: []
     }
@@ -51,6 +55,12 @@ export default {
   methods: {
     filterPlatforms () {
       this.$store.dispatch('filterPlatforms', this.selectedPlatforms)
+    },
+    filterGenres () {
+      this.$store.dispatch('filterGenres', this.selectedGenres)
+    },
+    filterSearch () {
+      this.$store.dispatch('search', this.search)
     }
   }
 }

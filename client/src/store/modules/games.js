@@ -5,7 +5,9 @@ function buildArgsString (args) {
   if (args.offset) url += 'offset=' + args.offset + '&'
   if (args.limit) url += 'limit=' + args.limit + '&'
   if (args.search) url += 'search=' + args.search + '&'
-  if (args.genres) url += 'genres=' + args.genres + '&'
+  if (args.genres && args.genres.length) {
+    url += 'genres=' + args.genres + '&'
+  }
   if (args.platforms && args.platforms.length) {
     url += 'platforms=' + args.platforms + '&'
   }
@@ -60,10 +62,22 @@ export default {
     }
   },
   actions: {
+    search ({ commit, dispatch }, search) {
+      commit('resetGames')
+      commit('setOffset', 0)
+      commit('setSearchFilter', search)
+      dispatch('retrieveGames')
+    },
     filterPlatforms ({ commit, dispatch }, platforms) {
       commit('resetGames')
       commit('setOffset', 0)
       commit('setPlatformFilter', platforms)
+      dispatch('retrieveGames')
+    },
+    filterGenres ({ commit, dispatch }, genres) {
+      commit('resetGames')
+      commit('setOffset', 0)
+      commit('setGenresFilter', genres)
       dispatch('retrieveGames')
     },
     async retrieveGames ({ commit, state }) {
