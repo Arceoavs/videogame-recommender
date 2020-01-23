@@ -1,19 +1,29 @@
 import Vue from 'vue'
 
-function concanateSting ({ offset, limit }) {
-  let url = '/games'
-  if (offset || limit) {
-    url += '?'
-    if (offset) url += 'offset=' + offset + '&'
-    if (limit) url += 'limit=' + limit
+function buildArgsString (args) {
+  let url = '/games?'
+  if (args.offset) url += 'offset=' + args.offset + '&'
+  if (args.limit) url += 'limit=' + args.limit + '&'
+  if (args.search) url += 'search=' + args.search + '&'
+  if (args.genres) url += 'genres=' + args.genres + '&'
+  if (args.platforms && args.platforms.length) {
+    url += 'platforms=' + args.platforms + '&'
   }
+  console.log(url)
   return url
 }
 
 export default {
   state: {
     games: [],
-    ratedGames: []
+    ratedGames: [],
+    args: {
+      offset: 0,
+      limit: 10,
+      search: null,
+      genres: null,
+      platforms: null
+    }
   },
   mutations: {
     resetGames (state) {
@@ -29,25 +39,52 @@ export default {
         ...games.filter(
           game => !state.games.find(
             g => g.id === game.id)))
+    },
+    setGames (state, games) {
+      state.games = games
+    },
+    setPlatformFilter (state, platforms) {
+      state.args.platforms = platforms
+    },
+    setGenresFilter (state, genres) {
+      state.args.genres = genres
+    },
+    setSearchFilter (state, search) {
+      state.args.search = search
+    },
+    setOffset (state, offset) {
+      state.args.offset = offset
+    },
+    setLimit (state, limit) {
+      state.args.limit = limit
     }
   },
   actions: {
-    async retrieveGames ({ commit }, { offset, limit }) {
+    filterPlatforms ({ commit, dispatch }, platforms) {
+      commit('resetGames')
+      commit('setOffset', 0)
+      commit('setPlatformFilter', platforms)
+      dispatch('retrieveGames')
+    },
+    async retrieveGames ({ commit, state }) {
+      console.log(state.args)
       try {
         const res = await Vue.prototype.$http.get(
-          concanateSting({ offset, limit }))
+          buildArgsString(state.args))
         commit('addGames', res.data.games)
       } catch (err) {
         commit('authError', err.message)
       }
     },
-    async loadNext ({ dispatch, getters }) {
-      await dispatch('retrieveGames',
-        { offset: getters.range.max, limit: 10 })
+    async loadNext ({ commit, dispatch, getters }) {
+      commit('setOffset', getters.range.max)
+      commit('setLimit', 10)
+      dispatch('retrieveGames')
     },
-    async loadPrev ({ dispatch, getters }) {
-      await dispatch('retrieveGames',
-        { offset: getters.range.min - 2, limit: 1 })
+    async loadPrev ({ commit, dispatch, getters }) {
+      commit('setOffset', getters.range.min - 2)
+      commit('setLimit', 1)
+      dispatch('retrieveGames')
     },
     async retrieveGamesRatedByUser ({ commit, rootState, dispatch }) {
       await dispatch('retrieveUserData')

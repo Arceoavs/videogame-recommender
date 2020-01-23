@@ -39,6 +39,7 @@
             chips
             small-chips
             multiple
+            @change="filterPlatforms"
             placeholder="Filter platforms")
 
         v-col(cols="12" lg="3" md="3" sm="5")
@@ -136,6 +137,9 @@ export default {
   methods: {
     rerenderSwiper () {
       this.swiperKey += 1
+    },
+    filterPlatforms () {
+      this.$store.dispatch('filterPlatforms', this.selectedPlatforms)
     }
   }
 }
