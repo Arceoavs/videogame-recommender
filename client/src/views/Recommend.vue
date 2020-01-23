@@ -34,6 +34,11 @@ v-img(height="100%"
                 :elevation="hover ? 22 : 1"
                 dismissible)
 
+        v-row(justify="start" align="start")
+          v-col
+            p.font-weight-light.title
+              | These are all the recommendations we can show you at this moment.
+
       #Loading(v-else)
         v-row(justify="start" align="center")
           v-col(cols="12")
