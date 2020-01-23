@@ -11,6 +11,7 @@ function buildArgsString (args) {
   if (args.platforms && args.platforms.length) {
     url += 'platforms=' + args.platforms + '&'
   }
+  console.log(url)
   return url
 }
 

@@ -6,6 +6,14 @@ v-card.card-outter(color="dp1"
   v-img.mx-auto(v-if="game.image_url"
     :src="game.image_url"
     height="200")
+    v-row(justify="end"
+      no-gutters
+      v-if="dismissible")
+      v-btn(icon
+        color="error"
+        large
+        @click="dismiss")
+        v-icon mdi-close
 
   v-card-title
     .overline.mr-3(v-for="platform in game.platforms"
@@ -30,7 +38,7 @@ v-card.card-outter(color="dp1"
         small)
         | {{genre.name}}
 
-  v-card-actions.card-actions.text-center.font-weight-light(v-if="rateable")
+  v-card-actions.card-actions.text-center.font-weight-light
     | Rate this game:
     .mx-2 ({{rating}})
     v-rating(v-model="rating"
@@ -40,13 +48,6 @@ v-card.card-outter(color="dp1"
       hover
       size="18"
       @input="rate")
-
-  v-card-actions.card-actions(v-if="dismissible")
-    v-btn.ml-3(color="error"
-      outlined
-      @click="dismiss")
-      v-icon mdi-close
-      | Dismiss
 
   v-dialog(v-model="dialog"
     width="500")
@@ -67,7 +68,6 @@ export default {
   props: {
     game: { type: Object, default: null },
     dismissible: { type: Boolean, default: false },
-    rateable: { type: Boolean, default: false },
     elevation: { type: Number, default: 0 }
   },
   data () {

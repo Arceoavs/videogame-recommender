@@ -20,8 +20,7 @@
           cols="12" sm="8" md="6" lg="4")
           v-hover(v-slot:default="{ hover }")
             GameCard(:game="game"
-              :elevation="hover ? 22 : 1"
-              dismissible)
+              :elevation="hover ? 22 : 1")
 
     #noExistingRatings(v-else)
       v-row(justify="start" align="center")
