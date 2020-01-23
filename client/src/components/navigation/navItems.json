@@ -1,12 +1,12 @@
 [
   {
-    "tag": "Rate",
+    "tag": "Ratings",
     "to": "rate",
     "icon": "mdi-star",
     "loggedIn": true
   },
   {
-    "tag": "Recommend",
+    "tag": "Recommendations",
     "to": "recommend",
     "icon": "mdi-settings",
     "loggedIn": true
