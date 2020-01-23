@@ -16,27 +16,47 @@ v-card.card-outter(color="dp1"
         v-icon mdi-close
 
   v-card-title
-    .overline.mr-3(v-for="platform in game.platforms"
+    .overline.mr-3(v-for="platform in game.platforms.slice(0,4)"
       :key="platform.id")
-      | {{platform.name}}
+      span {{platform.name}}
+    span.ml-1.overline(v-if="game.platforms.length > 4")
+      | and more
 
-  v-card-title
-    | {{game.title}}
-    .font-weight-light.ml-2 ({{game.year}})
-    v-btn(color="primary"
-      icon
-      @click="dialog=true")
-      v-icon mdi-information-variant
+  v-card-title.my-0
+    #text
+      span {{game.title}}
+      v-btn(color="primary"
+        icon
+        @click="dialog=true")
+        v-icon mdi-information-variant
+  v-card-subtitle.font-weight-light
+    span
+    | From {{game.year}},
+    v-chip.mx-2(label
+      small
+      :color="ratingsColor(game.avarage_rating)"
+      outlined)
+      | {{game.avarage_rating}}
+    span
+    | &empty; of {{game.ratings_count}} ratings
 
   v-card-text
     .mr-7
-      v-chip.mx-1.my-1(v-for="genre in game.genres"
+      v-chip.mx-1.my-1(v-for="genre in game.genres.slice(0,4)"
         :key="genre.id"
         color="primary"
         label
         outlined
-        small)
+        small
+        v-ripple)
         | {{genre.name}}
+      v-chip.ml-7-my-1(v-if="game.genres.length > 4"
+        outlined
+        small
+        label
+        color="primary"
+        @click="dialog='true'")
+        | ...
 
   v-card-actions.card-actions.text-center.font-weight-light
     | Rate this game:
@@ -53,6 +73,8 @@ v-card.card-outter(color="dp1"
     width="500")
     GameDetails(:title="game.title"
       :description="game.description"
+      :platforms="game.platforms"
+      :genres="game.genres"
       @close="dialog=false")
 </template>
 
@@ -85,6 +107,11 @@ export default {
     })
   },
   methods: {
+    ratingsColor (rating) {
+      if (rating > 8) return 'success'
+      else if (rating > 5) return 'primary'
+      else return 'error'
+    },
     async dismiss () {
       try {
         await this.$http.post('/rate', {
@@ -133,5 +160,8 @@ export default {
 .card-actions {
   position: absolute;
   bottom: 0;
+}
+.v-card__text, .v-card__title {
+  word-break: normal; /* maybe !important  */
 }
 </style>
