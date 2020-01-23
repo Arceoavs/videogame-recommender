@@ -39,7 +39,7 @@ export default new Vuex.Store({
     }
   },
   actions: {
-    async login ({ commit }, user) {
+    async login ({ commit, dispatch }, user) {
       commit('authRequest')
       try {
         const res = await Vue.prototype.$http.post('/login', user)
@@ -50,6 +50,8 @@ export default new Vuex.Store({
         localStorage.removeItem('token')
       } finally {
         commit('toggleSnackbar')
+        dispatch('retrieveGenres')
+        dispatch('retrievePlatforms')
       }
     },
 

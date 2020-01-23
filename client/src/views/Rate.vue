@@ -151,8 +151,6 @@ export default {
   },
   mounted () {
     this.$store.dispatch('retrieveGames', { limit: 10 })
-    this.$store.dispatch('retrieveGenres')
-    this.$store.dispatch('retrievePlatforms')
     this.$store.dispatch('retrieveGamesRatedByUser')
   },
   methods: {
