@@ -20,40 +20,7 @@
           h2.display-1
             | Rate new games
 
-      v-row.mt-2(justify="space-between" align="center" no-gutters)
-        v-col(cols="12" lg="3" md="3")
-          v-text-field(outlined
-            dense
-            clearable
-            prepend-inner-icon="mdi-magnify"
-            placeholder="Search for games")
-
-        v-col(cols="12" lg="3" md="3" sm="5")
-          v-autocomplete(outlined
-            dense
-            prepend-inner-icon="mdi-gamepad-variant-outline"
-            v-model="selectedPlatforms"
-            :items="platforms"
-            item-text="name"
-            item-value="id"
-            chips
-            small-chips
-            multiple
-            @change="filterPlatforms"
-            placeholder="Filter platforms")
-
-        v-col(cols="12" lg="3" md="3" sm="5")
-          v-autocomplete(outlined
-            dense
-            prepend-inner-icon="mdi-format-list-text"
-            v-model="selectedGenres"
-            :items="genres"
-            item-text="name"
-            item-value="id"
-            chips
-            small-chips
-            multiple
-            placeholder="Filter genres")
+      GameFilter
 
       v-row(justify="start" align="center"
         v-if="!gamesLoaded")
@@ -107,26 +74,19 @@
 import { mapGetters } from 'vuex'
 import Swiper from '@/components/games/Swiper'
 import Particles from '@/components/Particles'
+import GameFilter from '@/components/games/GameFilter'
 
 export default {
   name: 'Ratings',
   components: {
     Swiper,
-    Particles
-  },
-  data () {
-    return {
-      selectedGenres: [],
-      selectedPlatforms: []
-    }
+    Particles,
+    GameFilter
   },
   computed: {
     ...mapGetters(['sortedGames',
-      'range',
-      'genres',
       'gamesLoaded',
       'ratings',
-      'platforms',
       'neededRatingsAmount',
       'onboarding'])
   },
@@ -137,9 +97,6 @@ export default {
   methods: {
     rerenderSwiper () {
       this.swiperKey += 1
-    },
-    filterPlatforms () {
-      this.$store.dispatch('filterPlatforms', this.selectedPlatforms)
     }
   }
 }
