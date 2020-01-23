@@ -4,7 +4,8 @@
     v-col
       h2.display-1 Login
 
-  v-form(v-model="valid")
+  v-form(v-model="valid"
+    @submit.prevent="login")
     v-row(justify="start"
       no-gutters)
       v-col
@@ -34,7 +35,7 @@
         v-btn.mr-4(:to="{name: 'register'}")
           | Register
         v-btn.black--text(:disabled="!valid"
-          @click="login"
+          type="submit"
           color="primary")
           | Login
 </template>
