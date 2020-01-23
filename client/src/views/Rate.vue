@@ -48,7 +48,7 @@
             dense
             prepend-inner-icon="mdi-gamepad-variant-outline"
             v-model="selectedPlatforms"
-            :items="sortedPlatforms"
+            :items="platforms"
             item-text="name"
             item-value="id"
             chips
@@ -61,7 +61,7 @@
             dense
             prepend-inner-icon="mdi-format-list-text"
             v-model="selectedGenres"
-            :items="sortedGenres"
+            :items="genres"
             item-text="name"
             item-value="id"
             chips
@@ -142,10 +142,10 @@ export default {
   computed: {
     ...mapGetters(['sortedGames',
       'range',
-      'sortedGenres',
+      'genres',
       'ratedGames',
       'ratings',
-      'sortedPlatforms',
+      'platforms',
       'neededRatingsAmount',
       'onboarding'])
   },

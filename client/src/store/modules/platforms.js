@@ -22,8 +22,8 @@ export default {
     }
   },
   getters: {
-    platforms: state => state.platforms,
+    platforms: state => state.platforms
     // Descending order by count
-    sortedPlatforms: state => state.platforms.sort((a, b) => b.count - a.count)
+    // sortedPlatforms: state => state.platforms.sort((a, b) => b.count - a.count)
   }
 }

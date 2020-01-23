@@ -22,8 +22,6 @@ export default {
     }
   },
   getters: {
-    genres: state => state.genres,
-    // Descending order by count
-    sortedGenres: state => state.genres.sort((a, b) => b.count - a.count)
+    genres: state => state.genres
   }
 }
