@@ -2,9 +2,9 @@
 v-snackbar(v-model="showSnackbar"
   :color="color")
   | {{message}}
-  v-btn(text
-    @click="$emit('update', false)")
-    | Close
+  //- v-btn(text
+  //-   @click="$emit('update', false)")
+  //-   | Close
 </template>>
 
 <script>

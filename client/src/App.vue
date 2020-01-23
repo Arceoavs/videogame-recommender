@@ -1,7 +1,7 @@
 <template lang="pug">
 v-app(:style="{background: $vuetify.theme.themes[theme].background}")
   Navbar(@drawer="toggleDrawer")
-  Drawer(v-model="drawer", class="hidden-md-and-up")
+  Drawer.hidden-md-and-up(v-model="drawer")
   v-content
     router-view
     Confirmation
@@ -20,7 +20,8 @@ export default {
   components: { Navbar, Drawer, Footer, Confirmation },
   data () {
     return {
-      drawer: false
+      drawer: false,
+      snackbar: false
     }
   },
   computed: {
