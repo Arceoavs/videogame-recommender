@@ -7,7 +7,7 @@ v-footer(padless elevation="2")
         text
         small
         :to="{name: 'team'}")
-        |Team
+        | Team
 
       v-btn(dark
         text
