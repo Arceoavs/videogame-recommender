@@ -6,6 +6,12 @@ v-footer(padless elevation="2")
       v-btn(dark
         text
         small
+        :to="{name: 'team'}")
+        |Team
+
+      v-btn(dark
+        text
+        small
         href="mailto:info@vgr.best")
         | Contact
 

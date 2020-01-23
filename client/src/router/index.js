@@ -60,8 +60,8 @@ const routes = [
     }
   },
   {
-    path: '/contact',
-    name: 'contact',
+    path: '/team',
+    name: 'team',
     meta: {
       requiresAuth: false
     },
