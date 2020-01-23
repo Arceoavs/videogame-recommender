@@ -35,6 +35,10 @@ export default {
       throw err
     })
   },
+  mounted () {
+    this.$store.dispatch('retrieveGenres')
+    this.$store.dispatch('retrievePlatforms')
+  },
   methods: {
     toggleDrawer (val) {
       this.drawer = val

@@ -50,8 +50,6 @@ export default new Vuex.Store({
         localStorage.removeItem('token')
       } finally {
         commit('toggleSnackbar')
-        dispatch('retrieveGenres')
-        dispatch('retrievePlatforms')
       }
     },
 
