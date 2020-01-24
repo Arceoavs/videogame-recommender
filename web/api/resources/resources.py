@@ -161,10 +161,11 @@ class AllGames(Resource):
                 else:
                     return Game.return_searchtitle(offset, limit, args.search)
         if args.platforms is not None:
-            return Game.return_byplatform(offset,limit,args.platforms.split(","))
-        if args.genres is None:
-            search = args.search
-        else:
+            if args.genres is not None:
+                return Game.return_bygenres_platform(offset, limit, args.platforms.split(","), args.genres.split(","))
+            else:
+                return Game.return_byplatform(offset,limit,args.platforms.split(","))
+        if args.genres is not None:
             return Game.return_bygenres(offset, limit, genres.split(",")) 
         return Game.return_all(offset, limit)
 

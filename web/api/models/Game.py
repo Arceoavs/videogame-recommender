@@ -141,6 +141,18 @@ class Game(db.Model):
         return {'games': [g.to_json for g in _query.all()]}
 
     @classmethod
+    def return_bygenres_platform(self, offset, limit, platform2, genres2):
+        _query = self.query \
+            .join(Game.genres, aliased=True) \
+            .filter(Genre.id.in_(genres2)) \
+            .join(Game.platforms, aliased = True)\
+            .filter(Platform.id.in_(platform2))\
+            .order_by(Game.id) \
+            .offset(offset) \
+            .limit(limit)
+        return {'games': [g.to_json for g in _query.all()]}
+
+    @classmethod
     def return_recommendations(self, game_ids):
         results = self.query.filter(self.id.in_(game_ids)).all()
         sorted_results = sorted(results, key = lambda x: game_ids.index(x.id))
