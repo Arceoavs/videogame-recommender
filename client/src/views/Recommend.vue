@@ -17,7 +17,7 @@ v-img(height="100%"
             h2.display-1
               | The games you might want to try
             p.mt-1.font-weight-light.title
-              | If you already habe played a game of the list, just give it a rating.
+              | If you already have played a game of the list, just give it a rating.
           v-col(cols="6" sm="4" align="end")
             v-btn(@click="reretrieve"
               color="primary"
