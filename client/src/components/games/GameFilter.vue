@@ -57,7 +57,6 @@ export default {
   },
   watch: {
     searchQuery: debounce(function () {
-      console.log('true')
       this.isTyping = false
     }, 1000),
     isTyping (value) {
