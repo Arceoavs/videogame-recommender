@@ -88,14 +88,14 @@ export default {
         commit('authError', err.message)
       }
     },
-    async loadNext ({ commit, dispatch, getters }) {
-      commit('setOffset', getters.range.max)
+    async loadNext ({ commit, dispatch, state }) {
       commit('setLimit', 10)
+      commit('setOffset', state.args.offset + state.args.limit)
       dispatch('retrieveGames')
     },
-    async loadPrev ({ commit, dispatch, getters }) {
-      commit('setOffset', getters.range.min - 2)
+    async loadPrev ({ commit, dispatch, state }) {
       commit('setLimit', 1)
+      commit('setOffset', state.args.offset - 1 - state.args.limit)
       dispatch('retrieveGames')
     },
     async retrieveGamesRatedByUser ({ commit, rootState, dispatch }) {
