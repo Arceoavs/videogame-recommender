@@ -2,12 +2,12 @@
 v-row#GameFilters.mt-2(justify="space-between" align="center" no-gutters)
   v-col(cols="12" lg="3" md="3")
     v-text-field(outlined
-      v-model="search"
+      v-model="searchQuery"
       dense
       clearable
       prepend-inner-icon="mdi-magnify"
       placeholder="Search for games"
-      @change="filterSearch")
+      @input="isTyping = true")
 
   v-col(cols="12" lg="3" md="3" sm="5")
     v-autocomplete(outlined
@@ -40,17 +40,29 @@ v-row#GameFilters.mt-2(justify="space-between" align="center" no-gutters)
 
 <script>
 import { mapGetters } from 'vuex'
+import debounce from 'debounce'
+
 export default {
   name: 'GameFilter',
   data () {
     return {
-      search: '',
+      searchQuery: '',
+      isTyping: false,
       selectedGenres: [],
       selectedPlatforms: []
     }
   },
   computed: {
     ...mapGetters(['genres', 'platforms'])
+  },
+  watch: {
+    searchQuery: debounce(function () {
+      console.log('true')
+      this.isTyping = false
+    }, 1000),
+    isTyping (value) {
+      if (!value) this.filterSearch(this.searchQuery)
+    }
   },
   methods: {
     filterPlatforms () {
@@ -60,7 +72,7 @@ export default {
       this.$store.dispatch('filterGenres', this.selectedGenres)
     },
     filterSearch () {
-      this.$store.dispatch('search', this.search)
+      this.$store.dispatch('search', this.searchQuery)
     }
   }
 }
