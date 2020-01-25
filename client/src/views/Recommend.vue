@@ -38,6 +38,12 @@ v-img(height="100%"
           v-col
             p.font-weight-light.title
               | These are all the recommendations we can show you at this moment.
+          v-col(cols="6" sm="4" align="end")
+            v-btn(@click="reretrieve"
+              color="primary"
+              outlined)
+              v-icon.mr-2 mdi-refresh
+              | Refresh
 
       #Loading(v-else)
         v-row(justify="start" align="center")
