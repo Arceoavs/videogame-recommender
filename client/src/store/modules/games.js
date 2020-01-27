@@ -58,6 +58,11 @@ export default {
     },
     setLimit (state, limit) {
       state.args.limit = limit
+    },
+    resetFilter (state) {
+      state.args.search = null
+      state.args.genres = null
+      state.args.platforms = null
     }
   },
   actions: {
@@ -121,8 +126,10 @@ export default {
       : false,
     sortedGames: state => state.games.sort((a, b) => a.id - b.id),
     range: state => {
-      return { max: Math.max(...state.games.map(o => o.id), 0),
-        min: Math.min(...state.games.map(o => o.id), Number.MAX_SAFE_INTEGER) }
+      return {
+        max: Math.max(...state.games.map(o => o.id), 0),
+        min: Math.min(...state.games.map(o => o.id), Number.MAX_SAFE_INTEGER)
+      }
     },
     ratedGames: state => state.ratedGames.filter(g => !g.excluded),
     excludedGames: state => state.ratedGames.filter(g => g.excluded)

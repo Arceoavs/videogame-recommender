@@ -91,6 +91,8 @@ export default {
       'onboarding'])
   },
   mounted () {
+    this.$store.commit('resetGames')
+    this.$store.commit('resetFilter')
     this.$store.dispatch('retrieveGames', { limit: 10 })
     this.$store.dispatch('retrieveGamesRatedByUser')
   },
