@@ -17,7 +17,7 @@ v-card.card-outter(color="dp1"
         @click="dismiss")
         v-icon mdi-close
 
-  v-card-title
+  v-card-title(v-if="game.platforms")
     .overline.mr-3(v-for="platform in game.platforms.slice(0,4)"
       :key="platform.id")
       span {{platform.name}}
@@ -31,18 +31,22 @@ v-card.card-outter(color="dp1"
         icon
         @click="dialog=true")
         v-icon mdi-information-variant
+
   v-card-subtitle.font-weight-light
-    span
-    | From {{game.year}},
-    v-chip.mx-2(label
+    template(v-if="game.year")
+      span
+      | From {{game.year}}
+    v-chip.mx-2(v-if="game.avarage_rating"
+      label
       small
       :color="ratingsColor(game.avarage_rating)"
       outlined)
       | {{game.avarage_rating}}
-    span
-    | &empty; of {{game.ratings_count}} ratings
+    template(v-if="game.avarage_rating")
+      span
+      | &empty; of {{game.ratings_count}} ratings
 
-  v-card-text
+  v-card-text(v-if="game.genres")
     .mr-7
       v-chip.mx-1.my-1(v-for="genre in game.genres.slice(0,4)"
         :key="genre.id"
