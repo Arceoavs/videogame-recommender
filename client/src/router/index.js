@@ -11,7 +11,12 @@ const routes = [
   {
     path: '/',
     name: 'home',
-    component: () => import(/* webpackChunkName: "home" */ '@/views/Landing.vue')
+    component: () => import(/* webpackChunkName: "home" */ '@/views/Landing.vue'),
+    beforeEnter: (to, from, next) => {
+      if (store.getters.loggedIn) {
+        next('/rate')
+      } else next()
+    }
   },
   {
     path: '/register',
