@@ -264,7 +264,7 @@ class GameRecommendations(Resource):
             user_profile = csr_matrix((values, (user_ids_minus1, game_ids_minus1)), shape=(
                 1, user_game_matrix.shape[1]))
 
-            rec = model.recommend(0, user_profile, 100, recalculate_user=True)
+            rec = model.recommend(0, user_profile, 102, recalculate_user=True)
             rec_conv = [[int(rec[0])+1, float(rec[1])] for rec in rec]
 
             game_ids = [r[0] for r in rec_conv]
