@@ -22,8 +22,8 @@ class Platform(db.Model):
 
     @property
     def to_json_dangerously(self):
-        q = db.session.query(Platform).filter_by(id=self.id)#.join(Game.platforms)
-        #count = db.session.execute(q.statement.with_only_columns([db.func.count()]).order_by(None)).scalar()
+        # q = db.session.query(Platform).filter_by(id=self.id)#.join(Game.platforms)
+        # count = db.session.execute(q.statement.with_only_columns([db.func.count()]).order_by(None)).scalar()
         return {
             'id': self.id,
             'name': self.name,
@@ -33,5 +33,5 @@ class Platform(db.Model):
     @classmethod
     def return_all(cls):
         return {
-            'platforms': [p.to_json_dangerously for p in Platform.query.all()]
+            'platforms': [p.to_json for p in Platform.query.all()]
         }
