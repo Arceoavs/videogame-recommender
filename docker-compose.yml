@@ -49,21 +49,21 @@ services:
       - ./web:/web:z
     restart: always
 
-  # client:
-  #   build:
-  #     context: ./client
-  #     dockerfile: dev.Dockerfile
-  #   depends_on:
-  #     - web
-  #   env_file:
-  #     - .env
-  #   ports:
-  #     - 8080:8080
-  #   command: ["npm", "run", "serve", "--quiet", "--no-progress"]
-  #   volumes:
-  #     - "./client:/client:z"
-  #     - "/client/node_modules"
-  #   restart: always
+  client:
+    build:
+      context: ./client
+      dockerfile: dev.Dockerfile
+    depends_on:
+      - web
+    env_file:
+      - .env
+    ports:
+      - 8080:8080
+    command: ["npm", "run", "serve", "--quiet", "--no-progress"]
+    volumes:
+      - "./client:/client:z"
+      - "/client/node_modules"
+    restart: always
 
 volumes:
   postgresdb:
