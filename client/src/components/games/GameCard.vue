@@ -14,9 +14,9 @@ v-card.card-outter(color="dp1"
     v-row(justify="end"
       no-gutters
       v-if="dismissible")
-      v-btn(icon
+      v-btn.ma-1(fab
+        x-small
         color="error"
-        large
         @click="dismiss")
         v-icon mdi-close
 
