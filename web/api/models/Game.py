@@ -70,7 +70,7 @@ class Game(db.Model):
             'genres': genres,
             'platforms': platforms,
             'ratings_count': ratings_len,
-            'avarage_rating': None if ratings_len == 0 else round(ratings_sum / ratings_len, 2),
+            'avarage_rating': None if ratings_len == 0 else round(ratings_sum / ratings_len / 2, 2),
         }
         
     @classmethod
