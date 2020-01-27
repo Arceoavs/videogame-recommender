@@ -5,7 +5,10 @@ v-card.card-outter(color="dp1"
   :elevation="elevation")
   v-img.mx-auto(
     :src="game.image_url \
-      ? game.image_url \
+      ? imageUrl \
+      : require('@/assets/placeholder.svg')"
+    :lazy-src="game.image_url \
+      ? imageLazyUrl \
       : require('@/assets/placeholder.svg')"
     height="200")
     v-row(justify="end"
@@ -36,11 +39,10 @@ v-card.card-outter(color="dp1"
     template(v-if="game.year")
       span
       | From {{game.year}}
-    v-chip.mx-2(v-if="game.avarage_rating"
+    v-chip.mx-2.dp1--text.font-weight-bold(v-if="game.avarage_rating"
       label
       small
-      :color="ratingsColor(game.avarage_rating)"
-      outlined)
+      :color="ratingsColor(game.avarage_rating)")
       | {{game.avarage_rating}}
     template(v-if="game.avarage_rating")
       span
@@ -105,7 +107,13 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['ratings'])
+    ...mapGetters(['ratings']),
+    imageUrl () {
+      return this.game.image_url.slice(0, 28) + 'resize/600/-/' + this.game.image_url.slice(28)
+    },
+    imageLazyUrl () {
+      return this.game.image_url.slice(0, 28) + 'resize/80/-/' + this.game.image_url.slice(28)
+    }
   },
   mounted () {
     this.ratings.forEach(rating => {
@@ -114,8 +122,8 @@ export default {
   },
   methods: {
     ratingsColor (rating) {
-      if (rating > 8) return 'success'
-      else if (rating > 5) return 'primary'
+      if (rating > 4) return 'success'
+      else if (rating > 2.5) return 'primary'
       else return 'error'
     },
     async dismiss () {
