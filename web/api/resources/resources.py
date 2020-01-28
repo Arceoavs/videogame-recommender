@@ -230,12 +230,19 @@ class GameRecommendations(Resource):
     def initializeImplicit():
         print('[Implicit] Initializing Implicit model. This might take a while...')
         obj_ratings = Rating.query.filter(Rating.exclude_from_model == expression.false())
-        game_ids_minus1 = np.array(
-            [r.game_id-1 for r in obj_ratings]) # operations take some while
+        games = Game.query.with_entities(Game.id).order_by(Game.id.asc())
+        game_ids = [r.id for r in games]
+        keys = list(range(0, Game.query.count()))
+        global game_id_dict
+        global index_dict
+        game_id_dict = dict(zip(keys, game_ids))
+        index_dict = dict(zip(game_ids, keys))
+        game_indices = np.array(
+            [index_dict[r.game_id] for r in obj_ratings]) # operations take some while
         user_ids_minus1 = np.array(
             [r.user_id-1 for r in obj_ratings])
         values = np.asarray([r.value for r in obj_ratings])
-        game_user_matrix = csr_matrix((values, (game_ids_minus1, user_ids_minus1)), shape=(
+        game_user_matrix = csr_matrix((values, (game_indices, user_ids_minus1)), shape=(
             Game.query.count(), user_ids_minus1.size))
         global user_game_matrix
         user_game_matrix = game_user_matrix.T.tocsr()
@@ -257,7 +264,7 @@ class GameRecommendations(Resource):
             # create new user profile to also include ratings and predict for users not in model
             ratings = Rating.query.filter(Rating.user_id == user_id)
 
-            game_ids_minus1 = np.array([r.game_id-1 for r in ratings])
+            game_ids_minus1 = np.array([index_dict[r.game_id] for r in ratings])
             user_ids_minus1 = np.array([0]*game_ids_minus1.size)
             values = np.asarray([r.value for r in ratings])
 
@@ -265,7 +272,7 @@ class GameRecommendations(Resource):
                 1, user_game_matrix.shape[1]))
 
             rec = model.recommend(0, user_profile, 102, recalculate_user=True)
-            rec_conv = [[int(rec[0])+1, float(rec[1])] for rec in rec]
+            rec_conv = [[int(rec[0]), float(rec[1])] for rec in rec]
 
-            game_ids = [r[0] for r in rec_conv]
+            game_ids = [game_id_dict[r[0]] for r in rec_conv]
             return Game.return_recommendations(game_ids)
