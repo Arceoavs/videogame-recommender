@@ -30,10 +30,11 @@ services:
     restart: always
 
   proxy:
-    image: nginx:latest
+    image: nginx:1.16.0-alpine
     container_name: reverse_proxy
     depends_on: 
       - web
+      - client
     volumes:
       - ./proxy/nginx.conf:/etc/nginx/nginx.conf
       - ./proxy/error.log:/etc/nginx/error_log.log
@@ -62,20 +63,20 @@ services:
       - ./etl:/etl:z
 
   # Client is being served by netlify
-  # client: 
-  #   build: 
-  #     context: ./client
-  #     dockerfile: Dockerfile 
-  #   depends_on: 
-  #     - web
-  #   env_file:
-  #     - .env
-  #   ports: 
-  #     - 80:80
-  #   volumes:
-  #     - './client:/client:z'
-  #     - '/client/node_modules'
-  #   restart: always
+  client: 
+    container_name: client
+    build: 
+      context: ./client
+      dockerfile: Dockerfile
+    depends_on:
+      - web
+    env_file:
+      - .env
+    ports: 
+      - "80"
+    volumes:
+      - './client:/app:z'
+      - '/client/node_modules'
 
 volumes:
   postgresdb:
