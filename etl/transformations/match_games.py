@@ -8,6 +8,11 @@ from game_tokenizer import GameTokenizer, clean_string
 from queries import select_giantbomb_games, select_igdb_games, select_metacritic_games, select_game_matches, select_unmatched_giantbomb_games, select_unmatched_metacritic_games
 from utilities import engine, numbers as nb
 
+'''
+Matches the game data of all three sources to create a unified final game table and a respective lookup table.
+Multiple string-based similarity measures and custom rule-based filters are applied to establish an appropriate matching with a good tradeoff between precision and recall.
+'''
+
 
 metadata_filter = True
 year_filter = True

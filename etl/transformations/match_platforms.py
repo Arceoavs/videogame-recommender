@@ -4,6 +4,10 @@ import pandas as pd
 
 from utilities import engine
 
+'''
+Matches the platform data of all three sources to create a unified final platform table and a respective lookup table.
+'''
+
 with engine.connect() as connection:
   g_platforms = pd.read_sql_query(
     ''' 

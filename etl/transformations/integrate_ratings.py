@@ -6,6 +6,9 @@ from queries import (
 select_giantbomb_ratings,
 select_metacritic_ratings
 )
+'''
+Integrates the ratings of the data sources based on the established final user table and the lookup table for the games.
+'''
 with engine.connect() as connection:
     
     connection.execute('DELETE FROM ratings CASCADE')

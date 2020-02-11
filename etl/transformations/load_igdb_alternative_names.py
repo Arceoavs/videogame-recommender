@@ -3,6 +3,10 @@ import pandas as pd
 import sqlalchemy
 from utilities import engine
 
+'''
+Loads igdb aliases/alternative names from csv file into stage_alternative_names table of schema igdb.
+'''
+
 file_name = 'alternative_names'
 file_dir = 'igdb'
 

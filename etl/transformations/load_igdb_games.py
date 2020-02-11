@@ -4,6 +4,11 @@ import sqlalchemy
 from sqlalchemy.dialects import postgresql
 from utilities import engine, liststringToList
 
+'''
+Loads igdb games from csv file into stage_games table of schema igdb.
+Data quality issues are resolved.
+'''
+
 file_name = 'games'
 file_dir = 'igdb'
 

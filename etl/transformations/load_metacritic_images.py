@@ -2,6 +2,11 @@ import os
 import pandas as pd
 from utilities import engine
 
+'''
+Loads images of metacritic games from csv file into stage_games table of schema metacritic.
+Images are retrieved from RAWG-API (https://rawg.io/apidocs) based on the game names.
+'''
+
 file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../datasets/metacritic/images.csv"))
 
 print(f'Loading file {file_path} into database...')

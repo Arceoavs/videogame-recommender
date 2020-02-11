@@ -2,6 +2,10 @@ import os
 import pandas as pd
 from utilities import engine
 
+'''
+Loads igdb genres from csv file into stage_genres table of schema igdb.
+'''
+
 file_name = 'genres'
 file_dir = 'igdb'
 

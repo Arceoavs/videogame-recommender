@@ -2,6 +2,11 @@ import os
 import pandas as pd
 from utilities import engine
 
+'''
+Loads metacritic games from csv file into stage_games table of schema metacritic.
+Data quality issues are resolved.
+'''
+
 file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../datasets/metacritic/games.csv"))
 
 print(f'Loading file {file_path} into database...')

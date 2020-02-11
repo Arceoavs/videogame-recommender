@@ -2,6 +2,10 @@ import os
 import pandas as pd
 from utilities import engine
 
+'''
+Loads igdb platforms from csv file into stage_platforms table of schema igdb.
+'''
+
 file_name = 'platforms'
 file_dir = 'igdb'
 

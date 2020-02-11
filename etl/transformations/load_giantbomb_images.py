@@ -2,6 +2,11 @@ import os
 import pandas as pd
 from utilities import engine
 
+'''
+Loads images from giantbomb games from csv file into stage_images table of schema giantbomb.
+Images are retrieved from RAWG-API (https://rawg.io/apidocs) based on the game names.
+'''
+
 file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../datasets/giantbomb/images.csv"))
 
 print(f'Loading file {file_path} into database...')

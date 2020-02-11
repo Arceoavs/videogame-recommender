@@ -1,5 +1,9 @@
 from utilities import engine
 
+'''
+Modifications to the database to make it more performant for the final presentation. 
+Should not be executed in productive environment as it reduces the size of the database (mostly games without ratings).
+'''
 with engine.connect() as connection:
     connection.execute(
     """

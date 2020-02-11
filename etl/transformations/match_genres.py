@@ -5,6 +5,10 @@ from nltk.stem import PorterStemmer
 
 from utilities import engine
 
+'''
+Matches the genre data of metacritic and igdb to create a unified final genre table and a respective lookup table.
+'''
+
 with engine.connect() as connection:
   metacritic_genres = pd.read_sql_query(
     ''' 

@@ -2,6 +2,10 @@ import os
 import pandas as pd
 from utilities import engine
 
+'''
+Loads giantbomb user reviews from csv file into stage_user_reviews table of schema giantbomb.
+'''
+
 file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../datasets/giantbomb/user_reviews.csv'))
 
 print(f'Loading file {file_path} into database...')

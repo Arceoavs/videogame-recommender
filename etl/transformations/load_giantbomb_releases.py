@@ -4,6 +4,10 @@ import sqlalchemy
 from sqlalchemy.dialects import postgresql
 from utilities import engine
 
+'''
+Loads giantbomb releases from csv file into stage_releases table of schema giantbomb.
+'''
+
 file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../datasets/giantbomb/releases.csv'))
 
 print(f'Loading file {file_path} into database...')

@@ -2,6 +2,10 @@ import os
 import pandas as pd
 from utilities import engine
 
+'''
+Loads metacritic user comments from csv file into stage_user_comments table of schema metacritic.
+'''
+
 file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../datasets/metacritic/user_comments.csv"))
 
 print(f'Loading file {file_path} into database...')

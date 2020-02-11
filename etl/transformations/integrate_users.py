@@ -5,6 +5,12 @@ from utilities import engine
 # unhashed: leet1337
 DEFAULT_PASSWORD = '$pbkdf2-sha256$29000$632vFeL8P0fIGUMIAYAQIg$X.IgODMuJGDYE.xpcWLjjnDJmU5BwQ3uyld5Ixgll6Y'
 
+'''
+Integrates the users of the data sources. 
+Artificial domains are created for the different sources in order to differentiate these users and a standard password is set.
+Therefore it is possible to log in into the frontend with the users from the sources and not only self-created users.
+'''
+
 with engine.connect() as connection:
 
     connection.execute('DELETE FROM users CASCADE')

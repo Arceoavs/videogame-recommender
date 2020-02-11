@@ -3,6 +3,10 @@ import pandas as pd
 import sqlalchemy
 from utilities import engine
 
+'''
+Loads igdb ratings from csv file into stage_ratings table of schema igdb.
+'''
+
 file_name = 'ratings'
 file_dir = 'igdb'
 
