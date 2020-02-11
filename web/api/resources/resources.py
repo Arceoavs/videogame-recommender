@@ -189,18 +189,24 @@ class GameRating(Resource):
 
     @jwt_required
     def post(self):
+        '''
+        API route to provide and update game ratings. This route also enables to exclude games by giving them a negative rating.
+        :return: Success message and response code
+        '''
         user_email = get_jwt_identity()
         user = User.find_by_username(user_email)
         if not user:
             raise Exception(f'No user with email {user_email} found')
         user_id = user.id
         game_id = request.json['game_id']
+        # games can be excluded if they are dismissed in the frontend, which is realized by storing a negative rating
         exclude = request.json['exclude'] if 'exclude' in request.json else False
         value = request.json['value'] if not exclude else -0.5
         if not exclude and (value < 0 or value > 5):
             raise Exception('Rating value should be between 0 and 5')
         value = value * 2
         rating = Rating.query.filter(Rating.game_id==game_id, Rating.user_id==user_id).first()
+        # updates rating if one for specific user and specific game already exists
         if rating:
             rating.value = value
             rating.exclude_from_model = exclude
@@ -218,6 +224,9 @@ class GameRating(Resource):
 
 
 class initializeModel(Resource):
+    '''
+    Class to call model training via API.
+    '''
     def get(self):
         GameRecommendations.initializeImplicit()
         return {'message': 'The recommendation model was successfully (re)created.'}
@@ -228,15 +237,26 @@ class GameRecommendations(Resource):
     is_trained=False
 
     def initializeImplicit():
+        '''
+        Initializes an implicit ALS (alternating least squares) model.
+        In this model, user ratings are interpreted as confidences that the respective user liked the respecitve item.
+        Therefore, a high user ratings leads to a high confidence and a low rating to a low confidence.
+        For all unrated games there is no confidence at all.
+        Please check the implicit documentation for more details about this model.
+        '''
+
         print('[Implicit] Initializing Implicit model. This might take a while...')
+        # retrieve all game ratings that are not to be excluded
         obj_ratings = Rating.query.filter(Rating.exclude_from_model == expression.false())
         games = Game.query.with_entities(Game.id).order_by(Game.id.asc())
+        # create dictionaries to map game_ids to positions in matrix
         game_ids = [r.id for r in games]
         keys = list(range(0, Game.query.count()))
         global game_id_dict
         global index_dict
         game_id_dict = dict(zip(keys, game_ids))
         index_dict = dict(zip(game_ids, keys))
+        # create utility matrix out of game ratings
         game_indices = np.array(
             [index_dict[r.game_id] for r in obj_ratings]) # operations take some while
         user_ids_minus1 = np.array(
@@ -247,6 +267,7 @@ class GameRecommendations(Resource):
         global user_game_matrix
         user_game_matrix = game_user_matrix.T.tocsr()
         global model
+        # initialize and train the model
         model = implicit.als.AlternatingLeastSquares(factors=50)
         model.fit(game_user_matrix)
         global is_trained
@@ -255,6 +276,11 @@ class GameRecommendations(Resource):
 
     @jwt_required
     def get(self):
+        '''
+        Gets recommendations from trained model for a specific user.
+        Metadata about the games is added to the recommendations to properly display them in the frontend
+        :return: ordered list of game recommendations with metadata
+        '''
         if is_trained == False:
             return {'message': 'Model is not initialized. Please do so with /initModel'}, 503
         else:
@@ -270,9 +296,10 @@ class GameRecommendations(Resource):
 
             user_profile = csr_matrix((values, (user_ids_minus1, game_ids_minus1)), shape=(
                 1, user_game_matrix.shape[1]))
-
+            # get recommendations from trained model
             rec = model.recommend(0, user_profile, 102, recalculate_user=True)
             rec_conv = [[int(rec[0]), float(rec[1])] for rec in rec]
 
             game_ids = [game_id_dict[r[0]] for r in rec_conv]
+            # call function to add required metadata
             return Game.return_recommendations(game_ids)
