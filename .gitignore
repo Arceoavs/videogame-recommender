@@ -18,6 +18,8 @@ api.log
 test.db
 creds.ini
 
+etl/datasets/**
+
 # client specific
 node_modules
 
