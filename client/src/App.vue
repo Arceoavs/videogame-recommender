@@ -9,40 +9,41 @@ v-app(:style="{background: $vuetify.theme.themes[theme].background}")
 </template>
 
 <script>
-
-import Navbar from '@/components/navigation/Navbar'
-import Drawer from '@/components/navigation/Drawer'
-import Footer from '@/components/navigation/Footer'
-import Confirmation from '@/components/authentication/SnackMessage'
+import Navbar from "@/components/navigation/Navbar";
+import Drawer from "@/components/navigation/Drawer";
+import Footer from "@/components/navigation/Footer";
+import Confirmation from "@/components/authentication/SnackMessage";
 
 export default {
-  name: 'App',
+  name: "App",
   components: { Navbar, Drawer, Footer, Confirmation },
-  data () {
+  data() {
     return {
       drawer: false,
       snackbar: false
-    }
+    };
   },
   computed: {
-    theme () {
-      return this.$vuetify.theme.dark ? 'dark' : 'light'
+    theme() {
+      return this.$vuetify.theme.dark ? "dark" : "light";
     }
   },
-  created () {
+  created() {
     this.$http.interceptors.response.use(undefined, err => {
-      if (err.status === 401 && err.config && !err.config.__isRetryRequest) { this.$store.dispatch('logout') }
-      throw err
-    })
+      if (err.status === 401 && err.config && !err.config.__isRetryRequest) {
+        this.$store.dispatch("logout");
+      }
+      throw err;
+    });
   },
-  mounted () {
-    this.$store.dispatch('retrieveGenres')
-    this.$store.dispatch('retrievePlatforms')
+  mounted() {
+    this.$store.dispatch("retrieveGenres");
+    this.$store.dispatch("retrievePlatforms");
   },
   methods: {
-    toggleDrawer (val) {
-      this.drawer = val
+    toggleDrawer(val) {
+      this.drawer = val;
     }
   }
-}
+};
 </script>
